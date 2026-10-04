@@ -241,20 +241,24 @@ The script automatically clones the upstream Glorious QMK branch from GitLab, up
 
 ### 4. Flash to Keyboard
 
-1. **Put the keyboard into DFU Bootloader mode:**
-   * **Method 1 (Software):** Press **`Fn + Esc`** while plugged in (`QK_BOOT`).
-   * **Method 2 (Hardware Bootmagic — Most Reliable):** Unplug the USB cable, hold **`Space + B`** (or **`Esc`**), and reconnect the cable.
+> [!IMPORTANT]
+> **Always run the flash command FIRST before putting the keyboard into DFU mode!**
+> Because entering DFU mode makes the keyboard completely unresponsive to typing, starting the flash command first ensures you don't need a second keyboard. The script will safely compile your firmware and wait (`Waiting for WB32 DFU device...`) until the keyboard is connected in bootloader mode.
 
-   > [!TIP]
-   > **How to confirm DFU mode:** When entering the WB32 ROM DFU bootloader, **the keyboard will become completely unresponsive to typing and ALL RGB lights will turn OFF**. This indicates that the board is ready to receive firmware via DFU.
-
-2. **Flash the firmware:**
+1. **Start the flasher:**
 ```bash
-make flash
-# or: ./setup_and_flash.sh --flash
+./setup_and_flash.sh --flash
+# or: make flash
 ```
 
-*Manual flash option:*
+2. **Put the keyboard into DFU Bootloader mode while the script waits:**
+   * **Method 1 (Hardware Bootmagic — Most Reliable):** Unplug the USB cable, hold **`Space + B`** (or **`Esc`**), and reconnect the cable.
+   * **Method 2 (Software):** Press **`Fn + Esc`** on the keyboard (`QK_BOOT`).
+
+   > [!TIP]
+   > **How to confirm DFU mode:** When entering the WB32 ROM DFU bootloader, **the keyboard will become completely unresponsive to typing and ALL RGB lights will turn OFF**. The script will instantly detect the keyboard, flash the firmware, and automatically reboot it back into typing mode!
+
+*Manual flash option (if already in DFU mode):*
 ```bash
 wb32-dfu-updater_cli -D gmmk_gmmk3_p75_iso_default.bin -R
 ```
