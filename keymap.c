@@ -181,7 +181,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 static uint8_t active_profile = 0; // Starts at 0 to guarantee initial switch_to_profile() runs
 
-#define GMMK3_EEPROM_MAGIC_VERSION 0x4709 // Version tag to auto-initialize dynamic EEPROM on first boot
+#define GMMK3_EEPROM_MAGIC_VERSION 0x470A // Version tag to auto-initialize dynamic EEPROM on first boot
 
 #ifdef VIA_ENABLE
 void via_init_kb(void) {
@@ -192,8 +192,31 @@ void via_init_kb(void) {
 }
 #endif
 
+// Robust Fn layer state tracking across physical matrix events and QMK layer engine
+static bool fn_physically_held = false;
+static bool fn_layer_active    = false;
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+    fn_layer_active = (state & ((layer_state_t)1 << SHARED_FN)) != 0;
+    return state;
+}
+
+static inline bool is_fn_active(void) {
+    return fn_physically_held ||
+           fn_layer_active ||
+           layer_state_is(SHARED_FN) ||
+           ((layer_state & ((layer_state_t)1 << SHARED_FN)) != 0) ||
+           (get_highest_layer(layer_state | default_layer_state) == SHARED_FN);
+}
+
 // Context-Aware Key & Knob Click Handler
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    // Track physical Fn key (Row 9, Col 2 on 75% ISO) as well as any Fn keycodes
+    if ((record->event.key.row == 9 && record->event.key.col == 2) ||
+        keycode == MO(SHARED_FN) || keycode == MO(3) || keycode == MO(1)) {
+        fn_physically_held = record->event.pressed;
+    }
+
     switch (keycode) {
         case FN_SLEP:
             if (record->event.pressed) {
@@ -216,7 +239,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 uint8_t mods = get_mods();
 
                 // Fn Layer Active: Mouse Suite Clicks
-                if (layer_state_is(SHARED_FN)) {
+                if (is_fn_active()) {
                     if (mods & MOD_MASK_ALT) {
                         tap_code16(KC_MS_BTN3); // Mouse Middle Click
                     } else if (mods & MOD_MASK_SHIFT) {
@@ -310,7 +333,7 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
     uint8_t mods = get_mods();
 
     // 1. Fn Layer Active: Ergonomic Mouse Navigation Suite
-    if (layer_state_is(SHARED_FN)) {
+    if (is_fn_active()) {
         if (mods & MOD_MASK_ALT) {
             // Horizontal Wheel Scrolling
             tap_code16(clockwise ? KC_MS_WH_RIGHT : KC_MS_WH_LEFT);
@@ -530,7 +553,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     }
 
     // 2. Functional Layer Visual Feedback (When holding Fn)
-    if (layer_state_is(SHARED_FN)) {
+    if (is_fn_active()) {
         // Dim all non-functional keys to off/black
         for (uint8_t i = led_min; i < led_max; i++) {
             RGB_MATRIX_INDICATOR_SET_COLOR(i, 0, 0, 0);
@@ -591,9 +614,9 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         // --- Active Modifiers / State ---
         RGB_MATRIX_INDICATOR_SET_COLOR(LED_CAPS, 180, 180, 180); // Caps Lock
         RGB_MATRIX_INDICATOR_SET_COLOR(LED_LGUI, 140, 50, 190);  // GU_TOGG (GUI Lock)
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_FN,   (active_profile == 1) ? 0 : ((active_profile == 2) ? 220 : 10),
-                                                 (active_profile == 1) ? 220 : ((active_profile == 2) ? 220 : 80),
-                                                 (active_profile == 1) ? 220 : ((active_profile == 2) ? 220 : 255));
+        RGB_MATRIX_INDICATOR_SET_COLOR(LED_FN,   (active_profile == 2) ? 220 : ((active_profile == 3) ? 10 : 0),
+                                                 (active_profile == 2) ? 220 : ((active_profile == 3) ? 80 : 220),
+                                                 (active_profile == 2) ? 220 : ((active_profile == 3) ? 255 : 220));
 
         return false;
     }
@@ -610,4 +633,9 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         RGB_MATRIX_INDICATOR_SET_COLOR(i, base_r, base_g, base_b);
     }
     return false;
+}
+
+// Ensure both basic and advanced indicators hook into our indicator pipeline
+bool rgb_matrix_indicators_user(void) {
+    return rgb_matrix_indicators_advanced_user(0, RGB_MATRIX_LED_COUNT);
 }
