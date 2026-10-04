@@ -1,9 +1,17 @@
-# Glorious GMMK 3 Pro 75% ISO (WB32) — Custom Linux & Hyprland Firmware
+# Glorious GMMK 3 Pro 75% ISO (WB32) — Custom Linux Firmware
+
+```text
+   ______ __  __ __  __ _  __ _____     ____  ____   ___        ____ _____ ____ 
+  / ____// / / //  |/  // |/ //__  /    / __ \/ __ \ / _ \      /  _// ___// __ \
+ / / __ / / / // /|_/ // /|_/ / / /    / /_/ / /_/ // / / /     / /  \__ \/ / / /
+/ /_/ // /_/ // /  / // /  / / / /__  / ____// _, _// /_/ /   _/ /  ___/ / /_/ / 
+\____/ \____//_/  /_//_/  /_/ /____/ /_/    /_/ |_| \____/   /___/ /____/\____/  
+```
 
 [![Firmware](https://img.shields.io/badge/firmware-QMK-blue.svg)](https://qmk.fm)
 [![Platform](https://img.shields.io/badge/MCU-Westberry%20WB32FQ95-orange.svg)](https://www.westberrytech.com/)
 [![OS](https://img.shields.io/badge/OS-Arch%20Linux%20%7C%20Hyprland-blueviolet.svg)](https://archlinux.org)
-[![Layout](https://img.shields.io/badge/layout-Swedish%20ISO%2075%25-green.svg)](#layout--profiles)
+[![Layout](https://img.shields.io/badge/layout-Swedish%20ISO%2075%25-green.svg)](#-layout--profiles)
 [![VIA](https://img.shields.io/badge/configurator-VIA%20v3%20WebHID-red.svg)](https://usevia.app)
 [![License](https://img.shields.io/badge/license-GPL--2.0-yellow.svg)](LICENSE)
 
@@ -20,7 +28,7 @@ An open-source, ultra-low-latency QMK firmware replacement for the **Glorious GM
   * **True N-Key Rollover (NKRO)** forced active by default.
   * **Zero Debug Overhead**: Stripped serial logging and console polling for pure scanning throughput.
 * **Hardware 3-Position Slider Support**: Native matrix scanning of the rear slider switch dynamically selects OS profiles on the fly with RGB color confirmation.
-* **Context-Aware Productivity Encoder**: Turned into a high-speed scrubber, word navigator, tab manager, window controller, and mouse emulation tool (no volume dial).
+* **Context-Aware Productivity Encoder**: High-speed scrubber, word navigator, tab manager, window controller, and mouse emulation tool (no volume dial).
 * **Full VIA v3 WebHID Compatibility**: Edit keymaps and layers live in Chromium or [usevia.app](https://usevia.app) using the included Swedish ISO definitions.
 * **1-Click Build & Flash**: Automated environment setup, submodule checkouts, compilation, and bootloader flashing.
 
@@ -37,9 +45,24 @@ An open-source, ultra-low-latency QMK firmware replacement for the **Glorious GM
 Upstream vendor firmware erroneously configured `#define DIP_SWITCH_PINS { A13 }`. On WB32 chips, `A13` is the hardware `SWDIO/JTAG` debug interface, causing direct GPIO reads to fail.
 
 The physical 3-position rear slider is actually wired directly into **Column 7** of the keyboard matrix:
-* **Position 1 (Left Dot)**: Matrix `[Row 11, Col 7]` (`0x80` mask) $\rightarrow$ **Arch Linux Profile**
-* **Position 2 (Center Dot)**: Matrix `[Row 12, Col 7]` (`0x80` mask) $\rightarrow$ **macOS Profile**
-* **Position 3 (Right Dot)**: Matrix `[Row 13, Col 7]` (`0x80` mask) $\rightarrow$ **Windows Profile**
+
+```text
+┌────────────────────────────────────────────────────────────────────────┐
+│                        REAR HARDWARE SLIDER                            │
+│                                                                        │
+│               [Pos 1]                [Pos 2]             [Pos 3]       │
+│             (Left Dot)            (Center Dot)         (Right Dot)     │
+│              [===]                                                     │
+│            ●───────○────────○                   ○────────○───────●     │
+│               │                      │                   │             │
+│               ▼                      ▼                   ▼             │
+│          ARCH LINUX                macOS              WINDOWS          │
+│      • Caps Lock: · (middle)   • Opt ↔ Cmd swapped • Standard ISO Win │
+│      • Hyprland Focus & Kill   • Mac Shortcuts     • Win Shortcuts     │
+│      • Matrix: [Row 11, Col 7] • Matrix: [12, 7]   • Matrix: [13, 7]   │
+│      • [RGB Flash: Cyan]       • [RGB Flash: White]• [RGB Flash: Purple│
+└────────────────────────────────────────────────────────────────────────┘
+```
 
 A non-blocking matrix scanner in `housekeeping_task_user()` samples Rows 11, 12, and 13 every 25ms, dynamically activating the appropriate base layer and firing a visual RGB confirmation flash.
 
@@ -47,32 +70,94 @@ A non-blocking matrix scanner in `housekeeping_task_user()` samples Rows 11, 12,
 
 ## ⌨️ Layout & Profiles
 
-### Physical Slider Profiles
+### Physical Layout: 75% ISO Swedish (Arch Linux Profile 1)
 
-| Position | Target OS | Base Layer | Distinct Features | RGB Confirmation Flash |
-| :---: | :---: | :---: | :--- | :---: |
-| **Position 1 (Left)** | **Arch Linux** | `PROF_LINUX` (0) | Swedish ISO, Caps Lock mapped to Middle Dot (`·` via `RALT(KC_DOT)`) | **Cyan / Teal** |
-| **Position 2 (Center)** | **macOS** | `PROF_MAC` (1) | Left Option and Command swapped for native Mac muscle memory | **White** |
-| **Position 3 (Right)** | **Windows** | `PROF_WIN` (2) | Standard Windows ISO modifier cluster | **Purple** |
+```text
+┌───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐    ┌───────────┐
+│Esc│ │F1 │F2 │F3 │F4 │ │F5 │F6 │F7 │F8 │ │F9 │F10│F11│F12│    │   KNOB    │
+└───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘    │ ↺  ↻  🔘  │
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐    └───────────┘
+│ § │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │ 8 │ 9 │ 0 │ + │ ´ │Backsp │    ┌───┐
+├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤    │Del│
+│ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │ Å │ ¨ │     │    ├───┤
+├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┐ Ent│    │PgU│
+│  ·   │ A │ S │ D │ F │ G │ H │ J │ K │ L │ Ö │ Ä │ ' │    │    ├───┤
+├────┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴───┴┬───┤    │PgD│
+│Shft│ < │ Z │ X │ C │ V │ B │ N │ M │ , │ . │ - │Shift │ ↑ │    ├───┤
+├────┼───┴┬──┴─┬─┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬─┬───┼───┼────┤End│
+│Ctrl│Super│Alt│         Space          │AltG│ Fn │ │ ← │ ↓ │ →  │└───┘
+└────┴────┴────┴────────────────────────┴────┴────┘ └───┴───┴────┘
+```
+
+* **Position 1 (Arch Linux)**: Base layer 0 (`PROF_LINUX`). Caps Lock is customized to Swedish middle dot (`·` via `RALT(KC_DOT)`).
+* **Position 2 (macOS)**: Base layer 1 (`PROF_MAC`). Left Option and Command are swapped for natural macOS muscle memory.
+* **Position 3 (Windows)**: Base layer 2 (`PROF_WIN`). Standard Windows ISO modifiers.
+
+---
 
 ### Shared Function Layer (`SHARED_FN` / Layer 3)
-Activated by holding `MO(SHARED_FN)`:
-* **Esc**: Bootloader Mode (`QK_BOOT`)
-* **F1 – F12**: Media controls (`My Computer`, `Calculator`, `Prev`, `Next`, `Play`, `Stop`, `Mute`, `Vol -`, `Vol +`, `PrintScreen`)
-* **Number Row**: Direct Swedish programmer symbols: `{`, `[`, `]`, `}`, `\`
-* **Navigation**: Vim / Arrow cluster on `HJKL`, `Home`, `End`
-* **RGB Controls**: `RGB_TOG`, Hue, Saturation (`RGB_SAI`/`RGB_SAD`), Brightness (`RGB_VAI`/`RGB_VAD`), Effect modes (`RGB_MOD`/`RGB_RMOD`)
-* **EEPROM Clear**: `EE_CLR` (Fn + Backspace) resets dynamic VIA EEPROM memory.
+
+Hold `Fn` (`MO(SHARED_FN)`) to access media, navigation, and hardware RGB matrix controls:
+
+```text
+┌───────┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐    ┌───────────┐
+│QK_BOOT│ │MyC│Hom│Cal│Sel│ │Prv│Nxt│Ply│Stp│ │Mut│Vo-│Vo+│PSc│    │   MOUSE   │
+└───────┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘    │BTN1 / 2 / 3
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐    └───────────┘
+│   │   │   │   │   │   │   │ { │ [ │ ] │ } │ \ │   │EE_CLR │    ┌───┐
+├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤    │Ins│
+│RTOG │   │   │   │   │   │   │Hom│ ↑ │End│   │   │ ~ │     │    ├───┤
+├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┐    │    │   │
+│CapsLk│   │   │   │   │   │ ← │ ↓ │ ↑ │ → │   │   │   │    │    ├───┤
+├────┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴───┴┬───┤    │   │
+│    │ | │SAD│SAI│SPD│SPI│   │   │   │   │   │   │      │VAI│    ├───┤
+├────┼───┴┬──┴─┬─┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬─┬───┼───┼────┤   │
+│    │GUI │   │         Play/Pause      │    │    │ │RMOD│VAD│MOD │└───┘
+└────┴────┴────┴────────────────────────┴────┴────┘ └───┴───┴────┘
+```
+
+* **Esc**: DFU Bootloader Mode (`QK_BOOT`)
+* **Number Row**: Direct Swedish programmer bracket navigation: `{`, `[`, `]`, `}`, `\`
+* **Navigation Cluster**: Full arrow cluster and `Home` / `End`
+* **EE_CLR** (`Fn + Backspace`): Resets dynamic VIA EEPROM memory back to firmware defaults.
 
 ---
 
 ## 🎛️ Rotary Encoder & Knob Switch Matrix
 
-The rotary knob is purpose-built for video editing, code navigation, tab management, and window control with zero volume dial mapping.
+```text
+                     ┌────────────────────────┐
+                     │   ROTARY KNOB MODES    │
+                     └───────────┬────────────┘
+                                 │
+           ┌─────────────────────┼─────────────────────┐
+           │                     │                     │
+           ▼                     ▼                     ▼
+     [ DEFAULT ]             [ SHIFT ]              [ CTRL ]
+   ↺ : Step Left (←)      ↺ : Undo (Ctrl+Z)      ↺ : Zoom Out (-)
+   ↻ : Step Right (→)     ↻ : Redo (Ctrl+Y)      ↻ : Zoom In (+)
+   🔘: Mic Mute (PAUS)    🔘: Save File (Ctrl+S) 🔘: Reset 100% (0)
+           │                     │                     │
+           ├─────────────────────┼─────────────────────┤
+           │                     │                     │
+           ▼                     ▼                     ▼
+      [  ALT  ]           [ SHIFT + ALT ]          [ SUPER ]
+   ↺ : Prev Word          ↺ : Prev Tab           ↺ : Focus Left (←)
+   ↻ : Next Word          ↻ : Next Tab           ↻ : Focus Right (→)
+   🔘: Select Word (C+D)  🔘: Close Tab (C+W)    🔘: Kill Window (S+W)
+           │
+           └─────────────────────┬─────────────────────┐
+                                 │
+                                 ▼
+                         [ FN (MOUSE MODE) ]
+                   Fn Alone   : ↺ Cursor Up   ↻ Cursor Down   🔘 Left Click
+                   Fn + Shift : ↺ Cursor Left ↻ Cursor Right  🔘 Right Click
+                   Fn + Alt   : ↺ Scroll Left ↻ Scroll Right  🔘 Middle Click
+```
 
 ### Base Profiles (Linux / macOS / Windows)
 
-| State / Modifiers | Turn CCW | Turn CW | Knob Click (Press) | Workflow |
+| State / Modifiers | Turn CCW (↺) | Turn CW (↻) | Knob Click (🔘) | Workflow |
 | :--- | :--- | :--- | :--- | :--- |
 | **Default (None)** | **Step Backward** (`Left Arrow`) | **Step Forward** (`Right Arrow`) | **Hardware Pause / Mic Mute** (`KC_PAUS`) | Video scrubbing (DaVinci/YouTube), timeline navigation, Hyprland mic toggle |
 | **Shift** | **Undo** (`Ctrl+Z` / `Cmd+Z`) | **Redo** (`Ctrl+Y` / `Cmd+Shift+Z`) | **Save File** (`Ctrl+S` / `Cmd+S`) | Document history stepping & instant save |
@@ -83,7 +168,7 @@ The rotary knob is purpose-built for video editing, code navigation, tab managem
 
 ### Function Layer (`Fn`) — Ergonomic Mouse Suite
 
-| State / Modifiers | Turn CCW | Turn CW | Knob Click (Press) | Workflow |
+| State / Modifiers | Turn CCW (↺) | Turn CW (↻) | Knob Click (🔘) | Workflow |
 | :--- | :--- | :--- | :--- | :--- |
 | **Fn (Alone)** | **Cursor Up** (`KC_MS_UP`) | **Cursor Down** (`KC_MS_DOWN`) | **Mouse Left Click** (`KC_MS_BTN1`) | Primary Y-axis mouse navigation and selection |
 | **Fn + Shift** | **Cursor Left** (`KC_MS_LEFT`) | **Cursor Right** (`KC_MS_RIGHT`) | **Mouse Right Click** (`KC_MS_BTN2`) | Primary X-axis mouse navigation & context menus |
