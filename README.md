@@ -100,29 +100,42 @@ A non-blocking matrix scanner in `housekeeping_task_user()` samples Rows 11, 12,
 
 ### Shared Function Layer (`SHARED_FN` / Layer 3)
 
-Hold `Fn` (`MO(SHARED_FN)`) to access media, navigation, and hardware RGB matrix controls:
+Hold `Fn` (`MO(SHARED_FN)`) to access media, navigation, system controls, and interactive per-key color feedback:
 
 ```text
 ┌───────┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐    ┌───────────┐
 │QK_BOOT│ │MyC│Hom│Cal│Sel│ │Prv│Nxt│Ply│Stp│ │Mut│Vo-│Vo+│PSc│    │   MOUSE   │
 └───────┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘    │BTN1 / 2 / 3
 ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐    └───────────┘
-│   │   │   │   │   │   │   │ { │ [ │ ] │ } │ \ │   │EE_CLR │    ┌───┐
-├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤    │Ins│
-│RTOG │   │   │   │   │   │   │Hom│ ↑ │End│   │   │ ~ │     │    ├───┤
-├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┐    │    │   │
-│CapsLk│   │   │   │   │   │ ← │ ↓ │ ↑ │ → │   │   │   │    │    ├───┤
-├────┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴───┴┬───┤    │   │
-│    │ | │SAD│SAI│SPD│SPI│   │   │   │   │   │   │      │VAI│    ├───┤
-├────┼───┴┬──┴─┬─┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬─┬───┼───┼────┤   │
+│   │   │   │   │   │   │   │ { │ [ │ ] │ } │ \ │   │EE_CLR │    ┌───────────┐
+├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤    │  FN_SLEP  │
+│RTOG │   │   │   │   │   │   │Hom│ ↑ │End│   │   │ ~ │     │    │(OS Sleep) │
+├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┐    │    ├───────────┤
+│CapsLk│   │   │   │   │   │ ← │ ↓ │ ↑ │ → │   │   │   │    │    │           │
+├────┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴───┴┬───┤    │           │
+│    │ | │SAD│SAI│SPD│SPI│   │   │   │   │   │   │      │VAI│    ├───────────┤
+├────┼───┴┬──┴─┬─┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬─┬───┼───┼────┤           │
 │    │GUI │   │         Play/Pause      │    │    │ │RMOD│VAD│MOD │└───┘
 └────┴────┴────┴────────────────────────┴────┴────┘ └───┴───┴────┘
 ```
 
-* **Esc**: DFU Bootloader Mode (`QK_BOOT`)
-* **Number Row**: Direct Swedish programmer bracket navigation: `{`, `[`, `]`, `}`, `\`
-* **Navigation Cluster**: Full arrow cluster and `Home` / `End`
-* **EE_CLR** (`Fn + Backspace`): Resets dynamic VIA EEPROM memory back to firmware defaults.
+#### 💡 Intelligent Per-Key Layer Lighting
+When holding `Fn`, all non-functional keys are darkened to black, while active functional keys light up in distinct color clusters for effortless night visibility:
+
+| Key Cluster | Keys Illuminated | Color Glow | Purpose |
+| :--- | :--- | :--- | :--- |
+| **System & Sleep** | `Esc` (`QK_BOOT`), `Del` (`FN_SLEP`), `Backspace` (`EE_CLR`) | 🔴 **Red** / 🔵 **Azure Blue** / 🟠 **Orange** | Bootloader, instant OS sleep, and EEPROM reset |
+| **App Cluster** | `F1` – `F4` | 🟣 **Soft Violet** | My Computer, Browser Home, Calc, Player |
+| **Media Playback** | `F5` – `F9`, `Space` | 🟢 **Emerald Green** | Prev, Next, Play/Pause, Stop, Mute |
+| **Audio Volume** | `F10` – `F12` | 🟡 **Golden Amber** | Volume Down, Volume Up, PrintScreen |
+| **Brackets & Syntax** | `7`, `8`, `9`, `0`, `+`, `\`, `<` | 🔷 **Crisp Cyan** | Programmer symbols (`{ [ ] } \ \|`) |
+| **Navigation & Vim** | `H`, `J`, `K`, `L`, `U`, `I`, `O`, Arrows | ⚪ **Ice White** / 🟣 **Soft Purple** | Vim arrows (`← ↓ ↑ →`), `Home`, `End` |
+| **RGB Adjustments** | `Tab`, `C`, `V`, `B`, `N`, Arrow Cluster | 🟡 **Gold Yellow** | RGB Mode, Saturation, Speed, Brightness |
+
+* **Built-in OS Sleep Key (`Fn + Del`)**:
+  * **Linux / Windows**: Triggers universal ACPI system sleep (`KC_SLEP` / systemd suspend).
+  * **macOS**: Triggers native immediate sleep (`Cmd + Option + Eject`).
+* **EE_CLR (`Fn + Backspace`)**: Resets dynamic VIA EEPROM memory back to firmware defaults.
 
 ---
 

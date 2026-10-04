@@ -37,4 +37,4 @@
 #define DYNAMIC_KEYMAP_LAYER_COUNT 4   // Linux, Mac, Win, and Fn
 
 /* Power Management */
-#define RGB_DISABLE_WHEN_USB_SUSPENDED true
+#define RGB_MATRIX_SLEEP               // Shut down LEDs when USB host suspends/sleeps
