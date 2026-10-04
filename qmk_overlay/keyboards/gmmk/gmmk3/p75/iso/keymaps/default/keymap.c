@@ -6,6 +6,9 @@
 
 #include QMK_KEYBOARD_H
 #include "keymap_swedish.h"
+#ifdef VIA_ENABLE
+#    include "via.h"
+#endif
 
 /*
  * GMMK 3 Pro 75% - 3 Hardware Profiles via Physical Rear Slider (Matrix Column 7):
@@ -176,7 +179,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     )
 };
 
-static uint8_t active_profile = 1; // 1: Arch Linux, 2: macOS, 3: Windows
+static uint8_t active_profile = 0; // Starts at 0 to guarantee initial switch_to_profile() runs
+
+#define GMMK3_EEPROM_MAGIC_VERSION 0x4708 // Version tag to auto-initialize dynamic EEPROM on first boot
+
+#ifdef VIA_ENABLE
+void via_init_kb(void) {
+    // If the layout version in EEPROM does not match this firmware, force dynamic_keymap_reset()
+    if (eeprom_read_word((uint16_t *)VIA_EEPROM_CUSTOM_CONFIG_ADDR) != GMMK3_EEPROM_MAGIC_VERSION) {
+        via_eeprom_set_valid(false);
+    }
+}
+#endif
 
 // Context-Aware Key & Knob Click Handler
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -210,63 +224,78 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     } else {
                         tap_code16(KC_MS_BTN1); // Mouse Left Click
                     }
+                    return false;
                 }
-                // Base Layers Active
+
+                // Base Layers Active:
+                // 1. Shift + Alt: Close Active Tab
+                if ((mods & MOD_MASK_SHIFT) && (mods & MOD_MASK_ALT)) {
+                    clear_mods();
+                    send_keyboard_report();
+                    if (active_profile == 2) {
+                        tap_code16(G(KC_W)); // macOS Cmd + W
+                    } else {
+                        tap_code16(C(KC_W)); // Linux / Windows Ctrl + W
+                    }
+                    set_mods(mods);
+                    send_keyboard_report();
+                }
+                // 2. Super (GUI): Kill Active Window
+                else if (mods & MOD_MASK_GUI) {
+                    if (active_profile == 1) {
+                        // Hyprland: Super is already held; tap W sends Super + W (Omarchy killactive)
+                        tap_code(KC_W);
+                    } else if (active_profile == 2) {
+                        // macOS: Command is held; tap Q sends Cmd + Q (Quit app)
+                        tap_code(KC_Q);
+                    } else {
+                        // Windows: Alt + F4
+                        clear_mods();
+                        send_keyboard_report();
+                        tap_code16(A(KC_F4));
+                        set_mods(mods);
+                        send_keyboard_report();
+                    }
+                }
+                // 3. Ctrl: Reset Zoom to 100%
+                else if (mods & MOD_MASK_CTRL) {
+                    clear_mods();
+                    send_keyboard_report();
+                    if (active_profile == 2) {
+                        tap_code16(G(KC_0)); // macOS Cmd + 0
+                    } else {
+                        tap_code16(C(KC_0)); // Linux / Windows Ctrl + 0
+                    }
+                    set_mods(mods);
+                    send_keyboard_report();
+                }
+                // 4. Alt: Select Current Word / Occurrence
+                else if (mods & MOD_MASK_ALT) {
+                    clear_mods();
+                    send_keyboard_report();
+                    if (active_profile == 2) {
+                        tap_code16(G(KC_D)); // macOS Cmd + D
+                    } else {
+                        tap_code16(C(KC_D)); // Linux / Windows Ctrl + D
+                    }
+                    set_mods(mods);
+                    send_keyboard_report();
+                }
+                // 5. Shift: Save File
+                else if (mods & MOD_MASK_SHIFT) {
+                    clear_mods();
+                    send_keyboard_report();
+                    if (active_profile == 2) {
+                        tap_code16(G(KC_S)); // macOS Cmd + S
+                    } else {
+                        tap_code16(C(KC_S)); // Linux / Windows Ctrl + S
+                    }
+                    set_mods(mods);
+                    send_keyboard_report();
+                }
+                // 6. Default: Hardware Pause / Break (Hyprland mic mute hook)
                 else {
-                    // 1. Shift + Alt: Close Active Tab
-                    if ((mods & MOD_MASK_SHIFT) && (mods & MOD_MASK_ALT)) {
-                        del_mods(MOD_MASK_SHIFT | MOD_MASK_ALT);
-                        if (active_profile == 2) {
-                            tap_code16(G(KC_W)); // macOS Cmd + W
-                        } else {
-                            tap_code16(C(KC_W)); // Linux / Windows Ctrl + W
-                        }
-                        set_mods(mods);
-                    }
-                    // 2. Super (GUI): Kill Active Window
-                    else if (mods & MOD_MASK_GUI) {
-                        del_mods(MOD_MASK_GUI);
-                        if (active_profile == 1) {
-                            tap_code16(G(KC_W)); // Hyprland Omarchy Super + W (killactive)
-                        } else if (active_profile == 2) {
-                            tap_code16(G(KC_Q)); // macOS Cmd + Q
-                        } else {
-                            tap_code16(A(KC_F4)); // Windows Alt + F4
-                        }
-                        set_mods(mods);
-                    }
-                    // 3. Ctrl: Reset Zoom to 100%
-                    else if (mods & MOD_MASK_CTRL) {
-                        if (active_profile == 2) {
-                            tap_code16(G(KC_0)); // macOS Cmd + 0
-                        } else {
-                            tap_code16(C(KC_0)); // Linux / Windows Ctrl + 0
-                        }
-                    }
-                    // 4. Alt: Select Current Word / Occurrence
-                    else if (mods & MOD_MASK_ALT) {
-                        del_mods(MOD_MASK_ALT);
-                        if (active_profile == 2) {
-                            tap_code16(G(KC_D)); // macOS Cmd + D
-                        } else {
-                            tap_code16(C(KC_D)); // Linux / Windows Ctrl + D
-                        }
-                        set_mods(mods);
-                    }
-                    // 5. Shift: Save File
-                    else if (mods & MOD_MASK_SHIFT) {
-                        del_mods(MOD_MASK_SHIFT);
-                        if (active_profile == 2) {
-                            tap_code16(G(KC_S)); // macOS Cmd + S
-                        } else {
-                            tap_code16(C(KC_S)); // Linux / Windows Ctrl + S
-                        }
-                        set_mods(mods);
-                    }
-                    // 6. Default: Hardware Pause / Break (Hyprland mic mute hook)
-                    else {
-                        tap_code16(KC_PAUS);
-                    }
+                    tap_code16(KC_PAUS);
                 }
             }
             return false;
@@ -297,66 +326,124 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
 
     // 2. Shift + Alt: Browser & Editor Tab Management
     if ((mods & MOD_MASK_SHIFT) && (mods & MOD_MASK_ALT)) {
-        del_mods(MOD_MASK_SHIFT | MOD_MASK_ALT);
-        // Next Tab / Prev Tab
-        tap_code16(clockwise ? C(KC_TAB) : C(S(KC_TAB)));
+        clear_mods();
+        send_keyboard_report();
+        if (clockwise) {
+            // Next Tab: Ctrl + Tab
+            register_code(KC_LCTL);
+            tap_code(KC_TAB);
+            unregister_code(KC_LCTL);
+        } else {
+            // Prev Tab: Ctrl + Shift + Tab
+            register_code(KC_LCTL);
+            register_code(KC_LSFT);
+            tap_code(KC_TAB);
+            unregister_code(KC_LSFT);
+            unregister_code(KC_LCTL);
+        }
         set_mods(mods);
+        send_keyboard_report();
         return false;
     }
 
     // 3. Super (GUI): Window Management & Focus Navigation
     if (mods & MOD_MASK_GUI) {
-        del_mods(MOD_MASK_GUI);
         if (active_profile == 1) {
-            // Hyprland: Focus Right / Focus Left
-            tap_code16(clockwise ? G(KC_RGHT) : G(KC_LEFT));
+            // Hyprland: Super is physically held; tap Arrow directly to trigger `SUPER, RIGHT` or `SUPER, LEFT`
+            tap_code(clockwise ? KC_RGHT : KC_LEFT);
         } else if (active_profile == 2) {
             // macOS: App Switcher (Cmd + Tab / Cmd + Shift + Tab)
-            tap_code16(clockwise ? G(KC_TAB) : G(S(KC_TAB)));
+            if (clockwise) {
+                tap_code(KC_TAB);
+            } else {
+                register_code(KC_LSFT);
+                tap_code(KC_TAB);
+                unregister_code(KC_LSFT);
+            }
         } else {
             // Windows: Task Switcher (Alt + Tab / Alt + Shift + Tab)
-            tap_code16(clockwise ? A(KC_TAB) : A(S(KC_TAB)));
+            clear_mods();
+            send_keyboard_report();
+            if (clockwise) {
+                register_code(KC_LALT);
+                tap_code(KC_TAB);
+                unregister_code(KC_LALT);
+            } else {
+                register_code(KC_LALT);
+                register_code(KC_LSFT);
+                tap_code(KC_TAB);
+                unregister_code(KC_LSFT);
+                unregister_code(KC_LALT);
+            }
+            set_mods(mods);
+            send_keyboard_report();
         }
-        set_mods(mods);
         return false;
     }
 
     // 4. Ctrl: Universal Display & Document Zoom
     if (mods & MOD_MASK_CTRL) {
         if (active_profile == 2) {
+            clear_mods();
+            send_keyboard_report();
             tap_code16(clockwise ? G(SE_PLUS) : G(SE_MINS));
+            set_mods(mods);
+            send_keyboard_report();
         } else {
-            tap_code16(clockwise ? C(SE_PLUS) : C(SE_MINS));
+            // Ctrl is already held; send Swedish ISO plus/minus directly
+            tap_code16(clockwise ? SE_PLUS : SE_MINS);
         }
         return false;
     }
 
     // 5. Alt: Code & Text Word/Token Jump
     if (mods & MOD_MASK_ALT) {
-        del_mods(MOD_MASK_ALT);
         if (active_profile == 2) {
-            tap_code16(clockwise ? A(KC_RGHT) : A(KC_LEFT)); // Option + Right / Option + Left
+            // macOS: Option is held; Option + Right / Option + Left is native word jump
+            tap_code(clockwise ? KC_RGHT : KC_LEFT);
         } else {
-            tap_code16(clockwise ? C(KC_RGHT) : C(KC_LEFT)); // Ctrl + Right / Ctrl + Left
+            // Linux & Windows: Ctrl + Right / Ctrl + Left
+            clear_mods();
+            send_keyboard_report();
+            register_code(KC_LCTL);
+            tap_code(clockwise ? KC_RGHT : KC_LEFT);
+            unregister_code(KC_LCTL);
+            set_mods(mods);
+            send_keyboard_report();
         }
-        set_mods(mods);
         return false;
     }
 
     // 6. Shift: History Stepping (Undo / Redo)
     if (mods & MOD_MASK_SHIFT) {
-        del_mods(MOD_MASK_SHIFT);
+        clear_mods();
+        send_keyboard_report();
         if (active_profile == 2) {
-            tap_code16(clockwise ? G(S(KC_Z)) : G(KC_Z)); // Cmd + Shift + Z / Cmd + Z
+            // macOS: Cmd + Shift + Z (Redo) / Cmd + Z (Undo)
+            if (clockwise) {
+                register_code(KC_LGUI);
+                register_code(KC_LSFT);
+                tap_code(KC_Z);
+                unregister_code(KC_LSFT);
+                unregister_code(KC_LGUI);
+            } else {
+                register_code(KC_LGUI);
+                tap_code(KC_Z);
+                unregister_code(KC_LGUI);
+            }
         } else {
-            tap_code16(clockwise ? C(KC_Y) : C(KC_Z));     // Ctrl + Y / Ctrl + Z
+            // Linux & Windows: Ctrl + Y (Redo) / Ctrl + Z (Undo)
+            register_code(KC_LCTL);
+            tap_code(clockwise ? KC_Y : KC_Z);
+            unregister_code(KC_LCTL);
         }
         set_mods(mods);
+        send_keyboard_report();
         return false;
     }
 
     // 7. Default (Unmodified): Video / Timeline / Arrow Scrubbing
-    tap_code16(clockwise ? KC_RGHT : KC_LEFT);
+    tap_code(clockwise ? KC_RGHT : KC_LEFT);
     return false;
 }
 
@@ -375,21 +462,17 @@ static void switch_to_profile(uint8_t prof) {
     if (active_profile == prof) return;
     active_profile = prof;
 
-    // Turn off non-base profile layers
-    layer_off(PROF_MAC);
-    layer_off(PROF_WIN);
-
     switch (prof) {
         case 1: // Position 1: Arch Linux
-            // PROF_LINUX is Layer 0 (default base)
+            default_layer_set((layer_state_t)1 << PROF_LINUX);
             trigger_profile_flash(0, 255, 255);   // Cyan / Teal Flash
             break;
         case 2: // Position 2: macOS
-            layer_on(PROF_MAC);
+            default_layer_set((layer_state_t)1 << PROF_MAC);
             trigger_profile_flash(255, 255, 255); // White Flash
             break;
         case 3: // Position 3: Windows
-            layer_on(PROF_WIN);
+            default_layer_set((layer_state_t)1 << PROF_WIN);
             trigger_profile_flash(180, 0, 255);   // Purple Flash
             break;
     }
@@ -418,6 +501,14 @@ void keyboard_post_init_user(void) {
     if (!rgb_matrix_is_enabled()) {
         rgb_matrix_enable_noeeprom();
     }
+
+#ifdef VIA_ENABLE
+    // Ensure EEPROM is synced to compiled flash keymaps on first boot with new layout
+    if (eeprom_read_word((uint16_t *)VIA_EEPROM_CUSTOM_CONFIG_ADDR) != GMMK3_EEPROM_MAGIC_VERSION) {
+        eeconfig_init_via();
+        eeprom_update_word((uint16_t *)VIA_EEPROM_CUSTOM_CONFIG_ADDR, GMMK3_EEPROM_MAGIC_VERSION);
+    }
+#endif
 }
 
 // Non-blocking RGB matrix hook: solid dim minimal backlight with functional Fn layer map

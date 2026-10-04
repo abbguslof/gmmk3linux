@@ -12,6 +12,18 @@
     "menus": [
       "qmk_rgb_matrix"
     ],
+    "customKeycodes": [
+      {
+        "name": "KNOB_CLICK",
+        "title": "Smart Context Knob Click",
+        "shortName": "KNOB"
+      },
+      {
+        "name": "FN_SLEP",
+        "title": "Universal OS Sleep",
+        "shortName": "SLEEP"
+      }
+    ],
     "layouts": {
       "keymap": [
         [
