@@ -60,11 +60,12 @@ The physical 3-position rear slider is actually wired directly into **Column 7**
 │      • Caps Lock: · (middle)   • Opt ↔ Cmd swapped • Standard ISO Win │
 │      • Hyprland Focus & Kill   • Mac Shortcuts     • Win Shortcuts     │
 │      • Matrix: [Row 11, Col 7] • Matrix: [12, 7]   • Matrix: [13, 7]   │
-│      • [RGB Flash: Cyan]       • [RGB Flash: White]• [RGB Flash: Purple│
+│      • Ambient: Dim Grey/White • Ambient: Warm Amber• Ambient: Deep Blue│
+│      • [Flash: Cyan]           • [Flash: White]    • [Flash: Purple]   │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
-A non-blocking matrix scanner in `housekeeping_task_user()` samples Rows 11, 12, and 13 every 25ms, dynamically activating the appropriate base layer and firing a visual RGB confirmation flash.
+A non-blocking matrix scanner in `housekeeping_task_user()` samples Rows 11, 12, and 13 every 25ms, dynamically activating the appropriate base layer and firing a visual RGB confirmation flash before settling into the profile's solid dim ambient backlight.
 
 ---
 
@@ -89,9 +90,11 @@ A non-blocking matrix scanner in `housekeeping_task_user()` samples Rows 11, 12,
 └────┴────┴────┴────────────────────────┴────┴────┘ └───┴───┴────┘
 ```
 
-* **Position 1 (Arch Linux)**: Base layer 0 (`PROF_LINUX`). Caps Lock is customized to Swedish middle dot (`·` via `RALT(KC_DOT)`).
-* **Position 2 (macOS)**: Base layer 1 (`PROF_MAC`). Left Option and Command are swapped for natural macOS muscle memory.
-* **Position 3 (Windows)**: Base layer 2 (`PROF_WIN`). Standard Windows ISO modifiers.
+* **Position 1 (Arch Linux)**: Base layer 0 (`PROF_LINUX`). Caps Lock is customized to Swedish middle dot (`·` via `RALT(KC_DOT)`). Ambient lighting: **Solid Dim Neutral White / Grey** (with instant Cyan flash confirmation on switch).
+* **Position 2 (macOS)**: Base layer 1 (`PROF_MAC`). Left Option and Command are swapped for natural macOS muscle memory. Ambient lighting: **Solid Dim Warm Amber / Candlelight** (with instant White flash confirmation on switch).
+* **Position 3 (Windows)**: Base layer 2 (`PROF_WIN`). Standard Windows ISO modifiers. Ambient lighting: **Solid Dim Subtle Deep Blue** (with instant Purple flash confirmation on switch).
+
+*(Minimalist design: no rainbow RGB or animated distractions — pure solid faint backlight for night reading).*
 
 ---
 

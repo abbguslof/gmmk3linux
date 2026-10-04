@@ -304,22 +304,42 @@ void housekeeping_task_user(void) {
     }
 }
 
-// Initialize correct profile on startup
+// Initialize correct profile and RGB state on startup
 void keyboard_post_init_user(void) {
     poll_timer = timer_read();
+    if (!rgb_matrix_is_enabled()) {
+        rgb_matrix_enable_noeeprom();
+    }
 }
 
-// Non-blocking RGB matrix hook to render visual flash over active lighting
+// Non-blocking RGB matrix hook: solid dim minimal backlight with profile flash indicator
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+    if (!rgb_matrix_is_enabled()) {
+        return true;
+    }
+
+    // 1. Momentary profile confirmation flash (active for 500ms after slider change)
     if (flash_timer != 0) {
-        if (timer_elapsed(flash_timer) < 600) {
+        if (timer_elapsed(flash_timer) < 500) {
             for (uint8_t i = led_min; i < led_max; i++) {
                 RGB_MATRIX_INDICATOR_SET_COLOR(i, flash_r, flash_g, flash_b);
             }
             return false;
         } else {
-            flash_timer = 0; // Flash complete
+            flash_timer = 0; // Flash complete, settle to ambient solid dim color
         }
     }
-    return true;
+
+    // 2. Solid dim minimal baseline color per active OS profile (night reading friendly)
+    uint8_t base_r = 30, base_g = 32, base_b = 35; // Profile 1 (Arch Linux): Dim neutral white / grey
+    if (active_profile == 2) {
+        base_r = 45; base_g = 26; base_b = 8;       // Profile 2 (macOS): Dim warm amber / candlelight
+    } else if (active_profile == 3) {
+        base_r = 10; base_g = 25; base_b = 55;      // Profile 3 (Windows): Dim subtle deep blue
+    }
+
+    for (uint8_t i = led_min; i < led_max; i++) {
+        RGB_MATRIX_INDICATOR_SET_COLOR(i, base_r, base_g, base_b);
+    }
+    return false;
 }
