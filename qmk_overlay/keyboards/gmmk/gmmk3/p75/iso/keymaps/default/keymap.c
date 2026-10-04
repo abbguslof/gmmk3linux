@@ -181,7 +181,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 static uint8_t active_profile = 0; // Starts at 0 to guarantee initial switch_to_profile() runs
 
-#define GMMK3_EEPROM_MAGIC_VERSION 0x4708 // Version tag to auto-initialize dynamic EEPROM on first boot
+#define GMMK3_EEPROM_MAGIC_VERSION 0x4709 // Version tag to auto-initialize dynamic EEPROM on first boot
 
 #ifdef VIA_ENABLE
 void via_init_kb(void) {
@@ -579,14 +579,14 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
 
         // --- Hardware RGB Controls ---
         RGB_MATRIX_INDICATOR_SET_COLOR(LED_TAB,  180, 160, 20);  // RGB_TOG -> Gold Yellow
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_C,    180, 160, 20);  // RGB_SAD
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_V,    180, 160, 20);  // RGB_SAI
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_B,    180, 160, 20);  // RGB_SPD
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_N,    180, 160, 20);  // RGB_SPI
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_UP,   180, 160, 20);  // RGB_VAI
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_DOWN, 180, 160, 20);  // RGB_VAD
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_LEFT, 180, 160, 20);  // RGB_RMOD
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_RGHT, 180, 160, 20);  // RGB_MOD
+        RGB_MATRIX_INDICATOR_SET_COLOR(LED_Z,    180, 160, 20);  // RGB_SAD (Saturation -)
+        RGB_MATRIX_INDICATOR_SET_COLOR(LED_X,    180, 160, 20);  // RGB_SAI (Saturation +)
+        RGB_MATRIX_INDICATOR_SET_COLOR(LED_C,    180, 160, 20);  // RGB_SPD (Speed -)
+        RGB_MATRIX_INDICATOR_SET_COLOR(LED_V,    180, 160, 20);  // RGB_SPI (Speed +)
+        RGB_MATRIX_INDICATOR_SET_COLOR(LED_UP,   180, 160, 20);  // RGB_VAI (Brightness +)
+        RGB_MATRIX_INDICATOR_SET_COLOR(LED_DOWN, 180, 160, 20);  // RGB_VAD (Brightness -)
+        RGB_MATRIX_INDICATOR_SET_COLOR(LED_LEFT, 180, 160, 20);  // RGB_RMOD (Mode Prev)
+        RGB_MATRIX_INDICATOR_SET_COLOR(LED_RGHT, 180, 160, 20);  // RGB_MOD (Mode Next)
 
         // --- Active Modifiers / State ---
         RGB_MATRIX_INDICATOR_SET_COLOR(LED_CAPS, 180, 180, 180); // Caps Lock

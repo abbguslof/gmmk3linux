@@ -154,15 +154,18 @@ if [ "$FLASH_MODE" = true ]; then
     echo -e "\n${BOLD}================================================================${RESET}"
     echo -e "${YELLOW}${BOLD}Ready to Flash!${RESET}"
     echo -e "Put your keyboard into DFU Bootloader mode now:"
-    echo -e "  1. Press ${BOLD}Fn + Esc${RESET} on the keyboard, OR"
-    echo -e "  2. Unplug the USB cable, hold ${BOLD}Esc${RESET}, and reconnect the cable."
+    echo -e "  1. Press ${BOLD}Fn + Esc${RESET} on the keyboard (software jump), OR"
+    echo -e "  2. Unplug USB cable, hold ${BOLD}Space + B${RESET} (recommended) or ${BOLD}Esc${RESET}, and reconnect the cable."
+    echo -e "     ${CYAN}• Note: When DFU engages, the keyboard becomes unresponsive and ALL lights remain off.${RESET}"
     echo -e "Waiting for WB32 DFU device..."
     echo -e "${BOLD}================================================================${RESET}\n"
 
     wb32-dfu-updater_cli -w -D "${REPO_DIR}/${BIN_NAME}" -R
     log_success "Firmware flashed successfully and keyboard rebooted!"
 else
-    echo -e "\nTo flash to your keyboard, put it in bootloader (Fn+Esc) and run:"
+    echo -e "\nTo flash to your keyboard, put it in bootloader:"
+    echo -e "  • Press ${BOLD}Fn + Esc${RESET}, OR reconnect USB while holding ${BOLD}Space + B${RESET} (lights will turn off)"
+    echo -e "Then run:"
     echo -e "  ${BOLD}./setup_and_flash.sh --flash${RESET}"
     echo -e "  OR: ${BOLD}wb32-dfu-updater_cli -D ${REPO_DIR}/${BIN_NAME} -R${RESET}\n"
 fi

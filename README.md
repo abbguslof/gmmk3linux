@@ -50,18 +50,16 @@ The physical 3-position rear slider is actually wired directly into **Column 7**
 ┌────────────────────────────────────────────────────────────────────────┐
 │                        REAR HARDWARE SLIDER                            │
 │                                                                        │
-│               [Pos 1]                [Pos 2]             [Pos 3]       │
-│             (Left Dot)            (Center Dot)         (Right Dot)     │
-│              [===]                                                     │
-│            ●───────○────────○                   ○────────○───────●     │
-│               │                      │                   │             │
-│               ▼                      ▼                   ▼             │
-│          ARCH LINUX                macOS              WINDOWS          │
-│      • Caps Lock: · (middle)   • Opt ↔ Cmd swapped • Standard ISO Win │
-│      • Hyprland Focus & Kill   • Mac Shortcuts     • Win Shortcuts     │
-│      • Matrix: [Row 11, Col 7] • Matrix: [12, 7]   • Matrix: [13, 7]   │
-│      • Ambient: Dim Grey/White • Ambient: Warm Amber• Ambient: Deep Blue│
-│      • [Flash: Cyan]           • [Flash: White]    • [Flash: Purple]   │
+│         [Pos 1: Left]             [Pos 2: Mid]           [Pos 3: Right]│
+│             ●───────○────────○                   ○────────○───────●    │
+│                │                       │                     │         │
+│                ▼                       ▼                     ▼         │
+│           ARCH LINUX                 macOS                WINDOWS      │
+│      • Caps Lock: · (middle)   • Opt ↔ Cmd swapped   • Standard Win ISO│
+│      • Hyprland Focus & Kill   • Mac Shortcuts       • Win Shortcuts   │
+│      • Matrix: [Row 11, Col 7] • Matrix: [12, Col 7] • Matrix: [13, 7]│
+│      • Ambient: Dim Grey/White • Ambient: Warm Amber • Ambient: DeepBlu│
+│      • [RGB Flash: Cyan]       • [RGB Flash: White]  • [Flash: Purple] │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -74,19 +72,19 @@ A non-blocking matrix scanner in `housekeeping_task_user()` samples Rows 11, 12,
 ### Physical Layout: 75% ISO Swedish (Arch Linux Profile 1)
 
 ```text
-┌───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐    ┌───────────┐
-│Esc│ │F1 │F2 │F3 │F4 │ │F5 │F6 │F7 │F8 │ │F9 │F10│F11│F12│    │   KNOB    │
-└───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘    │ ↺  ↻  🔘  │
-┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐    └───────────┘
-│ § │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │ 8 │ 9 │ 0 │ + │ ´ │Backsp │    ┌───┐
-├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤    │Del│
-│ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │ Å │ ¨ │     │    ├───┤
-├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┐ Ent│    │PgU│
-│  ·   │ A │ S │ D │ F │ G │ H │ J │ K │ L │ Ö │ Ä │ ' │    │    ├───┤
-├────┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴───┴┬───┤    │PgD│
-│Shft│ < │ Z │ X │ C │ V │ B │ N │ M │ , │ . │ - │Shift │ ↑ │    ├───┤
-├────┼───┴┬──┴─┬─┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬─┬───┼───┼────┤End│
-│Ctrl│Super│Alt│         Space          │AltG│ Fn │ │ ← │ ↓ │ →  │└───┘
+┌───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐    ┌───────┐
+│Esc│ │F1 │F2 │F3 │F4 │ │F5 │F6 │F7 │F8 │ │F9 │F10│F11│F12│    │ KNOB  │
+└───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘    │ ↺ ↻ 🔘│
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐    └───────┘
+│ § │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │ 8 │ 9 │ 0 │ + │ ´ │Backsp │    ┌───────┐
+├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤    │  Del  │
+│ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │ Å │ ¨ │Ent  │    ├───────┤
+├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┐   │    │ PgUp  │
+│CapsLk│ A │ S │ D │ F │ G │ H │ J │ K │ L │ Ö │ Ä │ '  │   │    ├───────┤
+├────┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴───┴┬───┤    │ PgDn  │
+│Shft│ < │ Z │ X │ C │ V │ B │ N │ M │ , │ . │ - │ Shift │ ↑ │    ├───────┤
+├────┼───┴┬──┴─┬─┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬─┬───┼───┼────┤  End  │
+│Ctrl│Supr│Alt │         Space          │AltG│ Fn │ │ ← │ ↓ │ →  │└───────┘
 └────┴────┴────┴────────────────────────┴────┴────┘ └───┴───┴────┘
 ```
 
@@ -103,19 +101,19 @@ A non-blocking matrix scanner in `housekeeping_task_user()` samples Rows 11, 12,
 Hold `Fn` (`MO(SHARED_FN)`) to access media, navigation, system controls, and interactive per-key color feedback:
 
 ```text
-┌───────┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐    ┌───────────┐
-│QK_BOOT│ │MyC│Hom│Cal│Sel│ │Prv│Nxt│Ply│Stp│ │Mut│Vo-│Vo+│PSc│    │   MOUSE   │
-└───────┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘    │BTN1 / 2 / 3
-┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐    └───────────┘
-│   │   │   │   │   │   │   │ { │ [ │ ] │ } │ \ │   │EE_CLR │    ┌───────────┐
-├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤    │  FN_SLEP  │
-│RTOG │   │   │   │   │   │   │Hom│ ↑ │End│   │   │ ~ │     │    │(OS Sleep) │
-├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┐    │    ├───────────┤
-│CapsLk│   │   │   │   │   │ ← │ ↓ │ ↑ │ → │   │   │   │    │    │           │
-├────┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴───┴┬───┤    │           │
-│    │ | │SAD│SAI│SPD│SPI│   │   │   │   │   │   │      │VAI│    ├───────────┤
-├────┼───┴┬──┴─┬─┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬─┬───┼───┼────┤           │
-│    │GUI │   │         Play/Pause      │    │    │ │RMOD│VAD│MOD │└───┘
+┌───────┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐    ┌───────┐
+│QK_BOOT│ │MyC│Hom│Cal│Sel│ │Prv│Nxt│Ply│Stp│ │Mut│Vo-│Vo+│PSc│    │ MOUSE │
+└───────┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘    │ ↺ ↻ 🔘│
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐    └───────┘
+│   │   │   │   │   │   │   │ { │ [ │ ] │ } │ \ │   │EE_CLR │    ┌───────┐
+├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤    │FN_SLEP│
+│RTOG │   │   │   │   │   │   │Hom│ ↑ │End│   │   │ ~ │Ent  │    ├───────┤
+├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┐   │    │       │
+│CapsLk│   │   │   │   │   │ ← │ ↓ │ ↑ │ → │   │   │   │   │    ├───────┤
+├────┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴───┴┬───┤    │       │
+│    │ | │SAD│SAI│SPD│SPI│   │   │   │   │   │   │       │VAI│    ├───────┤
+├────┼───┴┬──┴─┬─┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬─┬───┼───┼────┤       │
+│    │GUI │   │         Play/Pause      │    │    │ │RMOD│VAD│MOD │└───────┘
 └────┴────┴────┴────────────────────────┴────┴────┘ └───┴───┴────┘
 ```
 
@@ -124,13 +122,15 @@ When holding `Fn`, all non-functional keys are darkened to black, while active f
 
 | Key Cluster | Keys Illuminated | Color Glow | Purpose |
 | :--- | :--- | :--- | :--- |
-| **System & Sleep** | `Esc` (`QK_BOOT`), `Del` (`FN_SLEP`), `Backspace` (`EE_CLR`) | 🔴 **Red** / 🔵 **Azure Blue** / 🟠 **Orange** | Bootloader, instant OS sleep, and EEPROM reset |
-| **App Cluster** | `F1` – `F4` | 🟣 **Soft Violet** | My Computer, Browser Home, Calc, Player |
-| **Media Playback** | `F5` – `F9`, `Space` | 🟢 **Emerald Green** | Prev, Next, Play/Pause, Stop, Mute |
-| **Audio Volume** | `F10` – `F12` | 🟡 **Golden Amber** | Volume Down, Volume Up, PrintScreen |
-| **Brackets & Syntax** | `7`, `8`, `9`, `0`, `+`, `\`, `<` | 🔷 **Crisp Cyan** | Programmer symbols (`{ [ ] } \ \|`) |
-| **Navigation & Vim** | `H`, `J`, `K`, `L`, `U`, `I`, `O`, Arrows | ⚪ **Ice White** / 🟣 **Soft Purple** | Vim arrows (`← ↓ ↑ →`), `Home`, `End` |
-| **RGB Adjustments** | `Tab`, `C`, `V`, `B`, `N`, Arrow Cluster | 🟡 **Gold Yellow** | RGB Mode, Saturation, Speed, Brightness |
+| **System & Sleep** | `Esc` (`QK_BOOT`), `Del` (`FN_SLEP`), `Backspace` (`EE_CLR`) | 🔴 **Red** / 🔵 **Azure Blue** / 🟠 **Orange** | Bootloader, instant universal OS sleep, and EEPROM reset |
+| **App & System** | `F1` – `F4` | 🟣 **Soft Violet** | `F1` (My Computer), `F2` (Browser Home), `F3` (Calculator), `F4` (Media Player) |
+| **Media Playback** | `F5` – `F9`, `Space` | 🟢 **Emerald Green** | `F5` (Prev Track), `F6` (Next Track), `F7` (Play), `F8` (Stop), `F9` (Mute), `Space` (Play/Pause) |
+| **Audio Volume** | `F10` – `F11` | 🟡 **Golden Amber** | `F10` (Volume Down), `F11` (Volume Up) |
+| **PrintScreen** | `F12` | 🟡 **Golden Amber** | Instant Screen Capture (`PrintScreen`) |
+| **Brackets & Programmer Syntax** | `7`, `8`, `9`, `0`, `+`, `\`, `<` | 🔷 **Crisp Cyan** | Swedish ISO programmer symbols (`{ [ ] } \ \|`) |
+| **Navigation & Vim** | `H`, `J`, `K`, `L`, `U`, `I`, `O` | ⚪ **Ice White** / 🟣 **Soft Purple** | Vim navigation (`← ↓ ↑ →`), `Home`, `End` |
+| **Hardware RGB Controls** | `Tab`, `Z`, `X`, `C`, `V`, Arrow Cluster | 🟡 **Gold Yellow** | Toggle (`Tab`), Saturation (`Z`/`X`), Speed (`C`/`V`), Brightness (`↑`/`↓`), Mode Prev/Next (`←`/`→`) |
+| **Windows GUI Lock** | `Super` (`GU_TOGG`) | 🟣 **Soft Violet** | Lock / unlock Windows key (`Super`) |
 
 * **Built-in OS Sleep Key (`Fn + Del`)**:
   * **Linux / Windows**: Triggers universal ACPI system sleep (`KC_SLEP` / systemd suspend).
@@ -241,10 +241,14 @@ The script automatically clones the upstream Glorious QMK branch from GitLab, up
 
 ### 4. Flash to Keyboard
 
-1. Put the keyboard into DFU Bootloader mode:
-   * Press **Fn + Esc** on the keyboard, OR
-   * Unplug the USB cable, hold **Esc**, and plug it back in.
-2. Run:
+1. **Put the keyboard into DFU Bootloader mode:**
+   * **Method 1 (Software):** Press **`Fn + Esc`** while plugged in (`QK_BOOT`).
+   * **Method 2 (Hardware Bootmagic — Most Reliable):** Unplug the USB cable, hold **`Space + B`** (or **`Esc`**), and reconnect the cable.
+
+   > [!TIP]
+   > **How to confirm DFU mode:** When entering the WB32 ROM DFU bootloader, **the keyboard will become completely unresponsive to typing and ALL RGB lights will turn OFF**. This indicates that the board is ready to receive firmware via DFU.
+
+2. **Flash the firmware:**
 ```bash
 make flash
 # or: ./setup_and_flash.sh --flash
