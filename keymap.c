@@ -47,95 +47,7 @@ enum custom_keycodes {
     FN_SLEP,      // Universal OS sleep key (Fn + Del)
 };
 
-// Physical LED index mapping for GMMK 3 Pro 75% ISO (AW20216S matrix driver)
-enum gmmk3_led_index {
-    LED_ESC   = 0,
-    LED_F1    = 1,
-    LED_F2    = 2,
-    LED_F3    = 3,
-    LED_F4    = 4,
-    LED_F5    = 5,
-    LED_F6    = 6,
-    LED_F7    = 7,
-    LED_F8    = 8,
-    LED_F9    = 9,
-    LED_F10   = 10,
-    LED_F11   = 11,
-    LED_F12   = 12,
 
-    LED_GRV   = 13, // §
-    LED_1     = 14,
-    LED_2     = 15,
-    LED_3     = 16,
-    LED_4     = 17,
-    LED_5     = 18,
-    LED_6     = 19,
-    LED_7     = 20, // {
-    LED_8     = 21, // [
-    LED_9     = 22, // ]
-    LED_0     = 23, // }
-    LED_MINS  = 24, // Backslash key (+ key in SE)
-    LED_EQL   = 25, // ´
-    LED_BSPC  = 26, // Backspace (EE_CLR)
-    LED_DEL   = 27, // Delete (FN_SLEP)
-
-    LED_TAB   = 28, // RGB_TOG
-    LED_Q     = 29,
-    LED_W     = 30,
-    LED_E     = 31,
-    LED_R     = 32,
-    LED_T     = 33,
-    LED_Y     = 34,
-    LED_U     = 35, // Home
-    LED_I     = 36, // Up
-    LED_O     = 37, // End
-    LED_P     = 38,
-    LED_ARNG  = 39,
-    LED_DIAE  = 40,
-    LED_HASH  = 41,
-    LED_PGUP  = 42,
-
-    LED_CAPS  = 43,
-    LED_A     = 44,
-    LED_S     = 45,
-    LED_D     = 46,
-    LED_F     = 47,
-    LED_G     = 48,
-    LED_H     = 49, // Vim Left
-    LED_J     = 50, // Vim Down
-    LED_K     = 51, // Vim Up
-    LED_L     = 52, // Vim Right
-    LED_SCLN  = 53,
-    LED_QUOT  = 54,
-    LED_ENT   = 55,
-    LED_PGDN  = 56,
-
-    LED_LSFT  = 57,
-    LED_NUBS  = 58, // |
-    LED_Z     = 59,
-    LED_X     = 60,
-    LED_C     = 61, // RGB_SAD
-    LED_V     = 62, // RGB_SAI
-    LED_B     = 63, // RGB_SPD
-    LED_N     = 64, // RGB_SPI
-    LED_M     = 65,
-    LED_COMM  = 66,
-    LED_DOT   = 67,
-    LED_SLSH  = 68,
-    LED_RSFT  = 69,
-    LED_UP    = 70, // RGB_VAI
-    LED_END   = 71,
-
-    LED_LCTL  = 72,
-    LED_LGUI  = 73, // GU_TOGG
-    LED_LALT  = 74,
-    LED_SPC   = 75, // Play/Pause
-    LED_RALT  = 76,
-    LED_FN    = 77,
-    LED_LEFT  = 78, // RGB_RMOD
-    LED_DOWN  = 79, // RGB_VAD
-    LED_RGHT  = 80  // RGB_MOD
-};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Profile 1: Arch Linux (Caps Lock is Swedish Middle Dot ·) */
@@ -534,7 +446,7 @@ void keyboard_post_init_user(void) {
 #endif
 }
 
-// Non-blocking RGB matrix hook: solid dim minimal backlight with functional Fn layer map
+// Non-blocking RGB matrix hook: solid dim minimal backlight per active OS profile
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     if (!rgb_matrix_is_enabled()) {
         return true;
@@ -552,76 +464,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         }
     }
 
-    // 2. Functional Layer Visual Feedback (When holding Fn)
-    if (is_fn_active()) {
-        // Dim all non-functional keys to off/black
-        for (uint8_t i = led_min; i < led_max; i++) {
-            RGB_MATRIX_INDICATOR_SET_COLOR(i, 0, 0, 0);
-        }
-
-        // --- System & Safety ---
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_ESC,  220, 20, 20);   // Bootloader (QK_BOOT) -> Red
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_DEL,  0, 160, 255);   // Built-in Sleep Button (FN_SLEP) -> Azure Blue
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_BSPC, 220, 70, 0);    // EEPROM Clear (EE_CLR) -> Orange
-
-        // --- App Shortcuts (F1 - F4) ---
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_F1,  120, 50, 190);   // My Computer -> Soft Violet
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_F2,  120, 50, 190);   // Web Browser Home
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_F3,  120, 50, 190);   // Calculator
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_F4,  120, 50, 190);   // Media Player Select
-
-        // --- Media Playback (F5 - F9, Space) ---
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_F5,  30, 180, 70);    // Prev Track -> Emerald Green
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_F6,  30, 180, 70);    // Next Track
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_F7,  30, 180, 70);    // Play
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_F8,  30, 180, 70);    // Stop
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_F9,  30, 180, 70);    // Mute
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_SPC, 30, 180, 70);    // Space = Play/Pause
-
-        // --- Volume & PrintScreen (F10 - F12) ---
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_F10, 190, 130, 20);   // Volume Down -> Amber
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_F11, 190, 130, 20);   // Volume Up
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_F12, 190, 130, 20);   // PrintScreen
-
-        // --- Programmer Brackets { [ ] } \ | ---
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_7,    0, 180, 180);   // { -> Crisp Cyan
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_8,    0, 180, 180);   // [
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_9,    0, 180, 180);   // ]
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_0,    0, 180, 180);   // }
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_MINS, 0, 180, 180);   // Backslash key 
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_NUBS, 0, 180, 180);   // |
-
-        // --- Navigation & Vim Cursor ---
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_H,    180, 190, 220); // Vim Left -> Ice White
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_J,    180, 190, 220); // Vim Down
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_K,    180, 190, 220); // Vim Up
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_L,    180, 190, 220); // Vim Right
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_U,    140, 70, 200);  // Home -> Soft Purple
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_I,    180, 190, 220); // Up
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_O,    140, 70, 200);  // End
-
-        // --- Hardware RGB Controls ---
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_TAB,  180, 160, 20);  // RGB_TOG -> Gold Yellow
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_Z,    180, 160, 20);  // RGB_SAD (Saturation -)
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_X,    180, 160, 20);  // RGB_SAI (Saturation +)
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_C,    180, 160, 20);  // RGB_SPD (Speed -)
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_V,    180, 160, 20);  // RGB_SPI (Speed +)
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_UP,   180, 160, 20);  // RGB_VAI (Brightness +)
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_DOWN, 180, 160, 20);  // RGB_VAD (Brightness -)
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_LEFT, 180, 160, 20);  // RGB_RMOD (Mode Prev)
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_RGHT, 180, 160, 20);  // RGB_MOD (Mode Next)
-
-        // --- Active Modifiers / State ---
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_CAPS, 180, 180, 180); // Caps Lock
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_LGUI, 140, 50, 190);  // GU_TOGG (GUI Lock)
-        RGB_MATRIX_INDICATOR_SET_COLOR(LED_FN,   (active_profile == 2) ? 220 : ((active_profile == 3) ? 10 : 0),
-                                                 (active_profile == 2) ? 220 : ((active_profile == 3) ? 80 : 220),
-                                                 (active_profile == 2) ? 220 : ((active_profile == 3) ? 255 : 220));
-
-        return false;
-    }
-
-    // 3. Solid dim minimal baseline color per active OS profile (night reading friendly)
+    // 2. Solid dim minimal baseline color per active OS profile (night reading friendly)
     uint8_t base_r = 30, base_g = 32, base_b = 35; // Profile 1 (Arch Linux): Dim neutral white / grey
     if (active_profile == 2) {
         base_r = 45; base_g = 26; base_b = 8;       // Profile 2 (macOS): Dim warm amber / candlelight
@@ -633,9 +476,4 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         RGB_MATRIX_INDICATOR_SET_COLOR(i, base_r, base_g, base_b);
     }
     return false;
-}
-
-// Ensure both basic and advanced indicators hook into our indicator pipeline
-bool rgb_matrix_indicators_user(void) {
-    return rgb_matrix_indicators_advanced_user(0, RGB_MATRIX_LED_COUNT);
 }

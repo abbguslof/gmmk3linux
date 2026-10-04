@@ -98,7 +98,7 @@ A non-blocking matrix scanner in `housekeeping_task_user()` samples Rows 11, 12,
 
 ### Shared Function Layer (`SHARED_FN` / Layer 3)
 
-Hold `Fn` (`MO(SHARED_FN)`) to access media, navigation, system controls, and interactive per-key color feedback:
+Hold `Fn` (`MO(SHARED_FN)`) to access media, navigation, system controls, and programming symbols:
 
 ```text
 ┌───────┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐    ┌───────┐
@@ -117,20 +117,19 @@ Hold `Fn` (`MO(SHARED_FN)`) to access media, navigation, system controls, and in
 └────┴────┴────┴────────────────────────┴────┴────┘ └───┴───┴────┘
 ```
 
-#### 💡 Intelligent Per-Key Layer Lighting
-When holding `Fn`, all non-functional keys are darkened to black, while active functional keys light up in distinct color clusters for effortless night visibility:
+#### ⌨️ Fn Layer Quick Reference Table
 
-| Key Cluster | Keys Illuminated | Color Glow | Purpose |
-| :--- | :--- | :--- | :--- |
-| **System & Sleep** | `Esc` (`QK_BOOT`), `Del` (`FN_SLEP`), `Backspace` (`EE_CLR`) | 🔴 **Red** / 🔵 **Azure Blue** / 🟠 **Orange** | Bootloader, instant universal OS sleep, and EEPROM reset |
-| **App & System** | `F1` – `F4` | 🟣 **Soft Violet** | `F1` (My Computer), `F2` (Browser Home), `F3` (Calculator), `F4` (Media Player) |
-| **Media Playback** | `F5` – `F9`, `Space` | 🟢 **Emerald Green** | `F5` (Prev Track), `F6` (Next Track), `F7` (Play), `F8` (Stop), `F9` (Mute), `Space` (Play/Pause) |
-| **Audio Volume** | `F10` – `F11` | 🟡 **Golden Amber** | `F10` (Volume Down), `F11` (Volume Up) |
-| **PrintScreen** | `F12` | 🟡 **Golden Amber** | Instant Screen Capture (`PrintScreen`) |
-| **Brackets & Programmer Syntax** | `7`, `8`, `9`, `0`, `+`, `\`, `<` | 🔷 **Crisp Cyan** | Swedish ISO programmer symbols (`{ [ ] } \ \|`) |
-| **Navigation & Vim** | `H`, `J`, `K`, `L`, `U`, `I`, `O` | ⚪ **Ice White** / 🟣 **Soft Purple** | Vim navigation (`← ↓ ↑ →`), `Home`, `End` |
-| **Hardware RGB Controls** | `Tab`, `Z`, `X`, `C`, `V`, Arrow Cluster | 🟡 **Gold Yellow** | Toggle (`Tab`), Saturation (`Z`/`X`), Speed (`C`/`V`), Brightness (`↑`/`↓`), Mode Prev/Next (`←`/`→`) |
-| **Windows GUI Lock** | `Super` (`GU_TOGG`) | 🟣 **Soft Violet** | Lock / unlock Windows key (`Super`) |
+| Key Cluster | Keys | Action / Feature |
+| :--- | :--- | :--- |
+| **System & Sleep** | `Esc`, `Del`, `Backspace` | `Esc` (DFU Bootloader), `Del` (Universal OS Sleep), `Backspace` (EEPROM Reset) |
+| **App & System** | `F1` – `F4` | `F1` (My Computer), `F2` (Browser Home), `F3` (Calculator), `F4` (Media Player) |
+| **Media Playback** | `F5` – `F9`, `Space` | `F5` (Prev Track), `F6` (Next Track), `F7` (Play), `F8` (Stop), `F9` (Mute), `Space` (Play/Pause) |
+| **Audio Volume** | `F10` – `F11` | `F10` (Volume Down), `F11` (Volume Up) |
+| **PrintScreen** | `F12` | Instant Screen Capture (`PrintScreen`) |
+| **Brackets & Syntax** | `7`, `8`, `9`, `0`, `+`, `\`, `<` | Swedish ISO programmer symbols (`{ [ ] } \ \|`) |
+| **Navigation & Vim** | `H`, `J`, `K`, `L`, `U`, `I`, `O` | Vim navigation (`← ↓ ↑ →`), `Home`, `End` |
+| **Hardware RGB Controls** | `Tab`, `Z`, `X`, `C`, `V`, Arrow Cluster | Toggle (`Tab`), Saturation (`Z`/`X`), Speed (`C`/`V`), Brightness (`↑`/`↓`), Mode Prev/Next (`←`/`→`) |
+| **Windows GUI Lock** | `Super` (`GU_TOGG`) | Lock / unlock Windows key (`Super`) |
 
 * **Built-in OS Sleep Key (`Fn + Del`)**:
   * **Linux / Windows**: Triggers universal ACPI system sleep (`KC_SLEP` / systemd suspend).
