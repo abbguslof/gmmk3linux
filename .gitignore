@@ -1,0 +1,15 @@
+# QMK and build outputs
+.build/
+*.bin.bak
+*.hex
+*.elf
+*.map
+*.o
+*.d
+
+# OS / Editor artifacts
+.DS_Store
+*.swp
+*~
+.vscode/
+.idea/
