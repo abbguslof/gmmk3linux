@@ -1,115 +1,52 @@
 /* Copyright 2026 gulo
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see .
+ * GMMK 3 Pro 75% ISO (WB32FQ95) - Multi-OS Adaptive Firmware
+ * Optimized for Arch Linux (Hyprland), macOS, and Windows
  */
 
 #include QMK_KEYBOARD_H
 #include "keymap_swedish.h"
 
 /*
- * GMMK 3 Pro 75% - 3 Hardware Profiles via Physical Rear Slider (Matrix Matrix Col 7):
- *   Position 1 (Matrix 11,7): Arch Linux (Flashes Cyan)   -> Caps Lock = · (middle dot)
- *   Position 2 (Matrix 12,7): macOS      (Flashes White)  -> Left Option & Command swapped
- *   Position 3 (Matrix 13,7): Windows    (Flashes Purple) -> Standard Windows ISO
+ * GMMK 3 Pro 75% - 3 Hardware Profiles via Physical Rear Slider (Matrix Column 7):
+ *   Position 1 (Matrix [11, 7]): Arch Linux (Flashes Cyan)   -> Caps Lock = · (middle dot)
+ *   Position 2 (Matrix [12, 7]): macOS      (Flashes White)  -> Left Option & Command swapped
+ *   Position 3 (Matrix [13, 7]): Windows    (Flashes Purple) -> Standard Windows ISO
  *
- * Rotary Knob Mappings:
- * ┌───────────────┬──────────────────────────────────────┬────────────────────────────────────────┐
- * │ Modifier      │ Fn Held (Mouse Emulation Suite)      │ Normal (Code & Text Manipulation)      │
- * ├───────────────┼──────────────────────────────────────┼────────────────────────────────────────┤
- * │ None (Turn)   │ Vertical Mouse Movement (Up / Down)  │ Move Lines Up / Down (Alt + Up / Down) │
- * │ Shift + Turn  │ Horizontal Mouse Move (Left / Right) │ Scrub Undo / Redo (Ctrl+Z / Ctrl+Y)    │
- * │ Ctrl + Turn   │ Native Scroll Wheel (WhDn / WhUp)    │ Universal Zoom In / Out (Ctrl+/-)      │
- * │ Alt + Turn    │ Slow Fine-Scroll / Micro Wheel       │ Word Token Jump (Ctrl+Right / Left)    │
- * │ Knob Press    │ Mouse Middle Click (KC_MS_BTN3)      │ Hardware Pause / Break (KC_PAUS)       │
- * └───────────────┴──────────────────────────────────────┴────────────────────────────────────────┘
- *
- * Layer 0: Arch Linux Swedish Base Layer
- * ┌───┐┌───┬───┬───┬───┐┌───┬───┬───┬───┐┌───┬───┬───┬───┐    ┌───┐
- * │Esc││F1 │F2 │F3 │F4 ││F5 │F6 │F7 │F8 ││F9 │F10│F11│F12│    │Pau│ (Knob Press)
- * └───┘└───┴───┴───┴───┘└───┴───┴───┴───┘└───┴───┴───┴───┘    └───┘
- * ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┬───┐
- * │ § │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │ 8 │ 9 │ 0 │ + │ ´ │ Backsp│Del│
- * ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┼───┤
- * │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │ Å │ ¨ │     │PgU│
- * ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┐ Ent├───┤
- * │  ·   │ A │ S │ D │ F │ G │ H │ J │ K │ L │ Ö │ Ä │ ' │    │PgD│
- * ├────┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴───┴┬───┼───┤
- * │Shft│ < │ Z │ X │ C │ V │ B │ N │ M │ , │ . │ - │Shift │ ↑ │End│
- * ├────┼───┴┬──┴─┬─┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬─┬───┼───┼───┤
- * │Ctrl│Super│Alt│         Space          │AltG│ Fn │ │ ← │ ↓ │ → │
- * └────┴────┴────┴────────────────────────┴────┴────┘ └───┴───┴───┘
- *
- * Layer 1: macOS Base Layer (Swapped Option / Command)
- * ┌───┐┌───┬───┬───┬───┐┌───┬───┬───┬───┐┌───┬───┬───┬───┐    ┌───┐
- * │Esc││F1 │F2 │F3 │F4 ││F5 │F6 │F7 │F8 ││F9 │F10│F11│F12│    │Pau│ (Knob Press)
- * └───┘└───┴───┴───┴───┘└───┴───┴───┴───┘└───┴───┴───┴───┘    └───┘
- * ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┬───┐
- * │ § │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │ 8 │ 9 │ 0 │ + │ ´ │ Backsp│Del│
- * ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┼───┤
- * │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │ Å │ ¨ │     │PgU│
- * ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┐ Ent├───┤
- * │CapsLk│ A │ S │ D │ F │ G │ H │ J │ K │ L │ Ö │ Ä │ ' │    │PgD│
- * ├────┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴───┴┬───┼───┤
- * │Shft│ < │ Z │ X │ C │ V │ B │ N │ M │ , │ . │ - │Shift │ ↑ │End│
- * ├────┼───┴┬──┴─┬─┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬─┬───┼───┼───┤
- * │Ctrl│ Opt │Cmd│         Space          │Cmd │ Fn │ │ ← │ ↓ │ → │
- * └────┴────┴────┴────────────────────────┴────┴────┘ └───┴───┴───┘
- *
- * Layer 2: Windows Base Layer
- * ┌───┐┌───┬───┬───┬───┐┌───┬───┬───┬───┐┌───┬───┬───┬───┐    ┌───┐
- * │Esc││F1 │F2 │F3 │F4 ││F5 │F6 │F7 │F8 ││F9 │F10│F11│F12│    │Pau│ (Knob Press)
- * └───┘└───┴───┴───┴───┘└───┴───┴───┴───┘└───┴───┴───┴───┘    └───┘
- * ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┬───┐
- * │ § │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │ 8 │ 9 │ 0 │ + │ ´ │ Backsp│Del│
- * ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┼───┤
- * │ Tab │ Q │ W │ E │ R │ T │ Y │ U │ I │ O │ P │ Å │ ¨ │     │PgU│
- * ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┐ Ent├───┤
- * │CapsLk│ A │ S │ D │ F │ G │ H │ J │ K │ L │ Ö │ Ä │ ' │    │PgD│
- * ├────┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴───┴┬───┼───┤
- * │Shft│ < │ Z │ X │ C │ V │ B │ N │ M │ , │ . │ - │Shift │ ↑ │End│
- * ├────┼───┴┬──┴─┬─┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬─┬───┼───┼───┤
- * │Ctrl│ Win │Alt│         Space          │AltG│ Fn │ │ ← │ ↓ │ → │
- * └────┴────┴────┴────────────────────────┴────┴────┘ └───┴───┴───┘
- *
- * Layer 3: Fn Function Layer (Media, Navigation, Coding & RGB)
- * ┌───┐┌───┬───┬───┬───┐┌───┬───┬───┬───┐┌───┬───┬───┬───┐    ┌───┐
- * │RST││MyC│Hom│Cal│Sel││Prv│Nxt│Ply│Stp││Mut│Vo-│Vo+│PSc│    │M3 │ (Knob Press)
- * └───┘└───┴───┴───┴───┘└───┴───┴───┴───┘└───┴───┴───┴───┘    └───┘
- * ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┬───┐
- * │   │   │   │   │   │   │   │ { │ [ │ ] │ } │ \ │   │EE_CLR │Ins│
- * ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┼───┤
- * │RTOG │   │   │   │   │   │   │Hom│ ↑ │End│   │   │ ~ │     │   │
- * ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┐    ├───┤
- * │CapsLk│   │   │   │   │   │ ← │ ↓ │ ↑ │ → │   │   │   │    │   │
- * ├────┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴───┴┬───┼───┤
- * │    │ | │SAD│SAI│SPD│SPI│   │   │   │   │   │   │      │VAI│   │
- * ├────┼───┴┬──┴─┬─┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬─┬───┼───┼───┤
- * │    │GUI │   │         Play/Pause      │    │    │ │RMOD│VAD│MOD│
- * └────┴────┴────┴────────────────────────┴────┴────┘ └───┴───┴───┘
+ * Context-Aware Rotary Encoder & Knob Switch Matrix:
+ * ┌─────────────────┬──────────────────────┬────────────────────────┬────────────────────────┐
+ * │ Modifier State  │ Turn CCW             │ Turn CW                │ Knob Press (Click)     │
+ * ├─────────────────┼──────────────────────┼────────────────────────┼────────────────────────┤
+ * │ Default (None)  │ Step Back (Left Arr) │ Step Fwd (Right Arr)   │ Mic Mute / Pause (PAUS)│
+ * │ Shift           │ Undo (Ctrl+Z/Cmd+Z)  │ Redo (Ctrl+Y/Cmd+S+Z)  │ Save File (Ctrl+S/CmdS)│
+ * │ Ctrl            │ Zoom Out (Ctrl/Cmd -)│ Zoom In (Ctrl/Cmd +)   │ Reset Zoom 100% (C/G 0)│
+ * │ Alt             │ Prev Word (Ctrl/OptL)│ Next Word (Ctrl/Opt R) │ Select Word (Ctrl/CmdD)│
+ * │ Shift + Alt     │ Prev Tab (C+S+Tab)   │ Next Tab (Ctrl+Tab)    │ Close Tab (Ctrl/Cmd W) │
+ * │ Super (GUI)     │ Focus Left (Super+←) │ Focus Right (Super+→)  │ Close Window (Super+W) │
+ * │                 │ (macOS: Cmd+S+Tab)   │ (macOS: Cmd+Tab)       │ (macOS: Cmd+Q)         │
+ * │                 │ (Win: Alt+S+Tab)     │ (Win: Alt+Tab)         │ (Win: Alt+F4)          │
+ * ├─────────────────┼──────────────────────┼────────────────────────┼────────────────────────┤
+ * │ Fn (Mouse Mode) │ Cursor Up (MS_UP)    │ Cursor Down (MS_DOWN)  │ Mouse Left Click (BTN1)│
+ * │ Fn + Shift      │ Cursor Left (MS_LEFT)│ Cursor Right (MS_RIGHT)│ Mouse Right Click(BTN2)│
+ * │ Fn + Alt        │ Wh Scroll Left       │ Wh Scroll Right        │ Mouse Mid Click (BTN3) │
+ * └─────────────────┴──────────────────────┴────────────────────────┴────────────────────────┘
  */
 
 enum custom_layers {
-    PROF_LINUX,   // 0: Linux (Position 1)
-    PROF_MAC,     // 1: macOS (Position 2)
-    PROF_WIN,     // 2: Windows (Position 3)
-    SHARED_FN     // 3: Fn Layer
+    PROF_LINUX,   // 0: Arch Linux Base (Position 1)
+    PROF_MAC,     // 1: macOS Base (Position 2)
+    PROF_WIN,     // 2: Windows Base (Position 3)
+    SHARED_FN     // 3: Function Layer
+};
+
+enum custom_keycodes {
+    KNOB_CLICK = SAFE_RANGE,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    /* Profile 1: Arch Linux (Caps is ·) */
+    /* Profile 1: Arch Linux (Caps Lock is Swedish Middle Dot ·) */
     [PROF_LINUX] = LAYOUT(
-        KC_ESC,        KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,             KC_PAUS,
+        KC_ESC,        KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,             KNOB_CLICK,
         SE_HALF,       KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    SE_PLUS, SE_ACUT, KC_BSPC,  KC_DEL,
         KC_TAB,        KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    SE_ARNG, SE_DIAE,            KC_PGUP,
         RALT(KC_DOT),  KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    SE_ODIA, SE_ADIA, SE_QUOT, KC_ENT,   KC_PGDN,
@@ -117,9 +54,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_LCTL,       KC_LGUI, KC_LALT,                         KC_SPC,                   KC_ALGR, MO(SHARED_FN),    KC_LEFT, KC_DOWN,  KC_RGHT
     ),
 
-    /* Profile 2: macOS (Left Option / Command swapped) */
+    /* Profile 2: macOS (Left Option / Command swapped for Mac layout) */
     [PROF_MAC] = LAYOUT(
-        KC_ESC,   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,             KC_PAUS,
+        KC_ESC,   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,             KNOB_CLICK,
         SE_HALF,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    SE_PLUS, SE_ACUT, KC_BSPC,  KC_DEL,
         KC_TAB,   KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    SE_ARNG, SE_DIAE,            KC_PGUP,
         KC_CAPS,  KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    SE_ODIA, SE_ADIA, SE_QUOT, KC_ENT,   KC_PGDN,
@@ -129,7 +66,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     /* Profile 3: Standard Windows */
     [PROF_WIN] = LAYOUT(
-        KC_ESC,   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,             KC_PAUS,
+        KC_ESC,   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,             KNOB_CLICK,
         SE_HALF,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    SE_PLUS, SE_ACUT, KC_BSPC,  KC_DEL,
         KC_TAB,   KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    SE_ARNG, SE_DIAE,            KC_PGUP,
         KC_CAPS,  KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    SE_ODIA, SE_ADIA, SE_QUOT, KC_ENT,   KC_PGDN,
@@ -139,7 +76,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     /* Universal Fn Layer */
     [SHARED_FN] = LAYOUT(
-        QK_BOOT,  KC_MYCM, KC_WHOM, KC_CALC, KC_MSEL, KC_MPRV, KC_MNXT, KC_MPLY, KC_MSTP, KC_MUTE, KC_VOLD, KC_VOLU, KC_PSCR,           KC_MS_BTN3,
+        QK_BOOT,  KC_MYCM, KC_WHOM, KC_CALC, KC_MSEL, KC_MPRV, KC_MNXT, KC_MPLY, KC_MSTP, KC_MUTE, KC_VOLD, KC_VOLU, KC_PSCR,           KNOB_CLICK,
         _______,  _______, _______, _______, _______, _______, _______, SE_LCBR, SE_LBRC, SE_RBRC, SE_RCBR, SE_BSLS, _______, EE_CLR,   KC_INS,
         RGB_TOG,  _______, _______, _______, _______, _______, _______, KC_HOME, KC_UP,   KC_END,  _______, _______, SE_TILD,          _______,
         KC_CAPS,  _______, _______, _______, _______, _______, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______, _______, _______, _______,  _______,
@@ -148,40 +85,170 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     )
 };
 
-// Rotary Knob configuration
-bool encoder_update_user(uint8_t index, bool clockwise) {
-    if (index == 0) {
-        uint8_t mods = get_mods();
+static uint8_t active_profile = 1; // 1: Arch Linux, 2: macOS, 3: Windows
 
-        // 1. Holding Fn: Mouse Emulation Suite
-        if (layer_state_is(SHARED_FN)) {
-            if (mods & MOD_MASK_SHIFT) {
-                tap_code16(clockwise ? KC_MS_RIGHT : KC_MS_LEFT);
-            } else if (mods & MOD_MASK_CTRL) {
-                tap_code16(clockwise ? KC_MS_WH_DOWN : KC_MS_WH_UP);
-            } else if (mods & MOD_MASK_ALT) {
-                tap_code16(clockwise ? KC_MS_WH_DOWN : KC_MS_WH_UP);
-            } else {
-                tap_code16(clockwise ? KC_MS_DOWN : KC_MS_UP);
+// Context-Aware Knob Click Handler
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (keycode == KNOB_CLICK) {
+        if (record->event.pressed) {
+            uint8_t mods = get_mods();
+
+            // Fn Layer Active: Mouse Suite Clicks
+            if (layer_state_is(SHARED_FN)) {
+                if (mods & MOD_MASK_ALT) {
+                    tap_code16(KC_MS_BTN3); // Mouse Middle Click
+                } else if (mods & MOD_MASK_SHIFT) {
+                    tap_code16(KC_MS_BTN2); // Mouse Right Click
+                } else {
+                    tap_code16(KC_MS_BTN1); // Mouse Left Click
+                }
+            }
+            // Base Layers Active
+            else {
+                // 1. Shift + Alt: Close Active Tab
+                if ((mods & MOD_MASK_SHIFT) && (mods & MOD_MASK_ALT)) {
+                    del_mods(MOD_MASK_SHIFT | MOD_MASK_ALT);
+                    if (active_profile == 2) {
+                        tap_code16(G(KC_W)); // macOS Cmd + W
+                    } else {
+                        tap_code16(C(KC_W)); // Linux / Windows Ctrl + W
+                    }
+                    set_mods(mods);
+                }
+                // 2. Super (GUI): Kill Active Window
+                else if (mods & MOD_MASK_GUI) {
+                    del_mods(MOD_MASK_GUI);
+                    if (active_profile == 1) {
+                        tap_code16(G(KC_W)); // Hyprland Omarchy Super + W (killactive)
+                    } else if (active_profile == 2) {
+                        tap_code16(G(KC_Q)); // macOS Cmd + Q
+                    } else {
+                        tap_code16(A(KC_F4)); // Windows Alt + F4
+                    }
+                    set_mods(mods);
+                }
+                // 3. Ctrl: Reset Zoom to 100%
+                else if (mods & MOD_MASK_CTRL) {
+                    if (active_profile == 2) {
+                        tap_code16(G(KC_0)); // macOS Cmd + 0
+                    } else {
+                        tap_code16(C(KC_0)); // Linux / Windows Ctrl + 0
+                    }
+                }
+                // 4. Alt: Select Current Word / Occurrence
+                else if (mods & MOD_MASK_ALT) {
+                    del_mods(MOD_MASK_ALT);
+                    if (active_profile == 2) {
+                        tap_code16(G(KC_D)); // macOS Cmd + D
+                    } else {
+                        tap_code16(C(KC_D)); // Linux / Windows Ctrl + D
+                    }
+                    set_mods(mods);
+                }
+                // 5. Shift: Save File
+                else if (mods & MOD_MASK_SHIFT) {
+                    del_mods(MOD_MASK_SHIFT);
+                    if (active_profile == 2) {
+                        tap_code16(G(KC_S)); // macOS Cmd + S
+                    } else {
+                        tap_code16(C(KC_S)); // Linux / Windows Ctrl + S
+                    }
+                    set_mods(mods);
+                }
+                // 6. Default: Hardware Pause / Break (Hyprland mic mute hook)
+                else {
+                    tap_code16(KC_PAUS);
+                }
             }
         }
-        // 2. Normal Modes (Fn NOT held): Code & Editing Suite
-        else {
-            if (mods & MOD_MASK_CTRL) {
-                tap_code16(clockwise ? C(SE_PLUS) : C(SE_MINS));
-            } else if (mods & MOD_MASK_SHIFT) {
-                del_mods(MOD_MASK_SHIFT);
-                tap_code16(clockwise ? C(KC_Y) : C(KC_Z));
-                set_mods(mods);
-            } else if (mods & MOD_MASK_ALT) {
-                del_mods(MOD_MASK_ALT);
-                tap_code16(clockwise ? C(KC_RGHT) : C(KC_LEFT));
-                set_mods(mods);
-            } else {
-                tap_code16(clockwise ? A(KC_DOWN) : A(KC_UP));
-            }
-        }
+        return false;
     }
+    return true;
+}
+
+// Context-Aware Rotary Encoder Rotation Handler
+bool encoder_update_user(uint8_t index, bool clockwise) {
+    if (index != 0) return false;
+
+    uint8_t mods = get_mods();
+
+    // 1. Fn Layer Active: Ergonomic Mouse Navigation Suite
+    if (layer_state_is(SHARED_FN)) {
+        if (mods & MOD_MASK_ALT) {
+            // Horizontal Wheel Scrolling
+            tap_code16(clockwise ? KC_MS_WH_RIGHT : KC_MS_WH_LEFT);
+        } else if (mods & MOD_MASK_SHIFT) {
+            // Horizontal Cursor Navigation (X-Axis)
+            tap_code16(clockwise ? KC_MS_RIGHT : KC_MS_LEFT);
+        } else {
+            // Vertical Cursor Navigation (Y-Axis)
+            tap_code16(clockwise ? KC_MS_DOWN : KC_MS_UP);
+        }
+        return false;
+    }
+
+    // 2. Shift + Alt: Browser & Editor Tab Management
+    if ((mods & MOD_MASK_SHIFT) && (mods & MOD_MASK_ALT)) {
+        del_mods(MOD_MASK_SHIFT | MOD_MASK_ALT);
+        // Next Tab / Prev Tab
+        tap_code16(clockwise ? C(KC_TAB) : C(S(KC_TAB)));
+        set_mods(mods);
+        return false;
+    }
+
+    // 3. Super (GUI): Window Management & Focus Navigation
+    if (mods & MOD_MASK_GUI) {
+        del_mods(MOD_MASK_GUI);
+        if (active_profile == 1) {
+            // Hyprland: Focus Right / Focus Left
+            tap_code16(clockwise ? G(KC_RGHT) : G(KC_LEFT));
+        } else if (active_profile == 2) {
+            // macOS: App Switcher (Cmd + Tab / Cmd + Shift + Tab)
+            tap_code16(clockwise ? G(KC_TAB) : G(S(KC_TAB)));
+        } else {
+            // Windows: Task Switcher (Alt + Tab / Alt + Shift + Tab)
+            tap_code16(clockwise ? A(KC_TAB) : A(S(KC_TAB)));
+        }
+        set_mods(mods);
+        return false;
+    }
+
+    // 4. Ctrl: Universal Display & Document Zoom
+    if (mods & MOD_MASK_CTRL) {
+        if (active_profile == 2) {
+            tap_code16(clockwise ? G(SE_PLUS) : G(SE_MINS));
+        } else {
+            tap_code16(clockwise ? C(SE_PLUS) : C(SE_MINS));
+        }
+        return false;
+    }
+
+    // 5. Alt: Code & Text Word/Token Jump
+    if (mods & MOD_MASK_ALT) {
+        del_mods(MOD_MASK_ALT);
+        if (active_profile == 2) {
+            tap_code16(clockwise ? A(KC_RGHT) : A(KC_LEFT)); // Option + Right / Option + Left
+        } else {
+            tap_code16(clockwise ? C(KC_RGHT) : C(KC_LEFT)); // Ctrl + Right / Ctrl + Left
+        }
+        set_mods(mods);
+        return false;
+    }
+
+    // 6. Shift: History Stepping (Undo / Redo)
+    if (mods & MOD_MASK_SHIFT) {
+        del_mods(MOD_MASK_SHIFT);
+        if (active_profile == 2) {
+            tap_code16(clockwise ? G(S(KC_Z)) : G(KC_Z)); // Cmd + Shift + Z / Cmd + Z
+        } else {
+            tap_code16(clockwise ? C(KC_Y) : C(KC_Z));     // Ctrl + Y / Ctrl + Z
+        }
+        set_mods(mods);
+        return false;
+    }
+
+    // 7. Default (Unmodified): Video / Timeline / Arrow Scrubbing
+    tap_code16(clockwise ? KC_RGHT : KC_LEFT);
     return false;
 }
 
@@ -196,15 +263,11 @@ static void trigger_profile_flash(uint8_t r, uint8_t g, uint8_t b) {
     flash_timer = timer_read();
 }
 
-// Active Profile switching engine based on physical switch matrix
-static uint8_t current_profile = 255;
-static uint16_t poll_timer = 0;
-
 static void switch_to_profile(uint8_t prof) {
-    if (current_profile == prof) return;
-    current_profile = prof;
+    if (active_profile == prof) return;
+    active_profile = prof;
 
-    // Turn off base layers
+    // Turn off non-base profile layers
     layer_off(PROF_MAC);
     layer_off(PROF_WIN);
 
@@ -224,12 +287,13 @@ static void switch_to_profile(uint8_t prof) {
     }
 }
 
-// Poll physical matrix state with zero overhead
+// Non-blocking real-time matrix poller for physical rear slider switch
+static uint16_t poll_timer = 0;
 void housekeeping_task_user(void) {
     if (timer_elapsed(poll_timer) > 25) {
         poll_timer = timer_read();
 
-        // Check Column 7 (bit 0x80) on Rows 11, 12, and 13
+        // Sample Column 7 (bit 0x80) on Rows 11, 12, and 13
         if (matrix_get_row(11) & 0x80) {
             switch_to_profile(1);
         } else if (matrix_get_row(12) & 0x80) {
@@ -242,11 +306,10 @@ void housekeeping_task_user(void) {
 
 // Initialize correct profile on startup
 void keyboard_post_init_user(void) {
-    // Delay check slightly to let matrix scanning stabilize
     poll_timer = timer_read();
 }
 
-// Non-blocking RGB matrix hook to render visual flash over animations
+// Non-blocking RGB matrix hook to render visual flash over active lighting
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     if (flash_timer != 0) {
         if (timer_elapsed(flash_timer) < 600) {

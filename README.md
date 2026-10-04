@@ -18,8 +18,9 @@ An open-source, ultra-low-latency QMK firmware replacement for the **Glorious GM
   * **1000Hz (1ms) USB Polling Rate** forced via hardware descriptor (`USB_POLLING_INTERVAL_MS 1`).
   * **0ms Latency Eager Debouncing** (`sym_eager_pk`) registering instant keydown response on first switch contact.
   * **True N-Key Rollover (NKRO)** forced active by default.
-  * **Zero Debug Overhead**: Removed serial logging and console polling for pure scanning throughput.
+  * **Zero Debug Overhead**: Stripped serial logging and console polling for pure scanning throughput.
 * **Hardware 3-Position Slider Support**: Native matrix scanning of the rear slider switch dynamically selects OS profiles on the fly with RGB color confirmation.
+* **Context-Aware Productivity Encoder**: Turned into a high-speed scrubber, word navigator, tab manager, window controller, and mouse emulation tool (no volume dial).
 * **Full VIA v3 WebHID Compatibility**: Edit keymaps and layers live in Chromium or [usevia.app](https://usevia.app) using the included Swedish ISO definitions.
 * **1-Click Build & Flash**: Automated environment setup, submodule checkouts, compilation, and bootloader flashing.
 
@@ -65,21 +66,28 @@ Activated by holding `MO(SHARED_FN)`:
 
 ---
 
-## 🎛️ Rotary Encoder & Knob Switch
+## 🎛️ Rotary Encoder & Knob Switch Matrix
 
-The rotary encoder and push switch provide rich contextual actions:
+The rotary knob is purpose-built for video editing, code navigation, tab management, and window control with zero volume dial mapping.
 
-| Action / Modifier | Mode / State | Behavior |
-| :--- | :--- | :--- |
-| **Turn (Normal)** | Unmodified | **Volume Up / Down** (or Line Up/Down) |
-| **Turn + Shift** | Any profile | **Scrub Undo / Redo** (`Ctrl + Z` / `Ctrl + Y`) |
-| **Turn + Ctrl** | Any profile | **Universal Zoom** (`Ctrl + Plus` / `Ctrl + Minus`) |
-| **Turn + Alt** | Any profile | **Word Jump** (`Ctrl + Right` / `Ctrl + Left`) |
-| **Turn + Fn** | Fn Layer held | **Mouse Wheel / Vertical Navigation** |
-| **Knob Click** | Normal | **Hardware Pause / Mic Mute** (`KC_PAUS`) |
-| **Knob Click + Fn** | Fn Layer held | **Mouse Middle Click** (`KC_MS_BTN3`) |
+### Base Profiles (Linux / macOS / Windows)
 
-*(Note: In Arch Linux Hyprland / Omarchy, `KC_PAUS` natively triggers your microphone mute toggle script).*
+| State / Modifiers | Turn CCW | Turn CW | Knob Click (Press) | Workflow |
+| :--- | :--- | :--- | :--- | :--- |
+| **Default (None)** | **Step Backward** (`Left Arrow`) | **Step Forward** (`Right Arrow`) | **Hardware Pause / Mic Mute** (`KC_PAUS`) | Video scrubbing (DaVinci/YouTube), timeline navigation, Hyprland mic toggle |
+| **Shift** | **Undo** (`Ctrl+Z` / `Cmd+Z`) | **Redo** (`Ctrl+Y` / `Cmd+Shift+Z`) | **Save File** (`Ctrl+S` / `Cmd+S`) | Document history stepping & instant save |
+| **Ctrl** | **Zoom Out** (`Ctrl+-` / `Cmd+-`) | **Zoom In** (`Ctrl++` / `Cmd++`) | **Reset Zoom 100%** (`Ctrl+0` / `Cmd+0`) | Universal display scaling across browsers, IDEs, and terminals |
+| **Alt** | **Previous Word** (`Ctrl+Left` / `Opt+Left`) | **Next Word** (`Ctrl+Right` / `Opt+Right`) | **Select Word / Token** (`Ctrl+D` / `Cmd+D`) | Fast code/text navigation & multi-cursor expansion |
+| **Shift + Alt** | **Previous Tab** (`Ctrl+Shift+Tab`) | **Next Tab** (`Ctrl+Tab`) | **Close Active Tab** (`Ctrl+W` / `Cmd+W`) | Browser & editor tab cycling and closing |
+| **Super (GUI)** | **Focus Left** (`Super+Left`)<br>*(macOS: `Cmd+Shift+Tab`)*<br>*(Win: `Alt+Shift+Tab`)* | **Focus Right** (`Super+Right`)<br>*(macOS: `Cmd+Tab`)*<br>*(Win: `Alt+Tab`)* | **Kill Active Window** (`Super+W`)<br>*(macOS: `Cmd+Q`)*<br>*(Win: `Alt+F4`)* | Native Hyprland Omarchy window navigation & close without lifting hands |
+
+### Function Layer (`Fn`) — Ergonomic Mouse Suite
+
+| State / Modifiers | Turn CCW | Turn CW | Knob Click (Press) | Workflow |
+| :--- | :--- | :--- | :--- | :--- |
+| **Fn (Alone)** | **Cursor Up** (`KC_MS_UP`) | **Cursor Down** (`KC_MS_DOWN`) | **Mouse Left Click** (`KC_MS_BTN1`) | Primary Y-axis mouse navigation and selection |
+| **Fn + Shift** | **Cursor Left** (`KC_MS_LEFT`) | **Cursor Right** (`KC_MS_RIGHT`) | **Mouse Right Click** (`KC_MS_BTN2`) | Primary X-axis mouse navigation & context menus |
+| **Fn + Alt** | **Horizontal Wheel Left** (`KC_MS_WH_LEFT`) | **Horizontal Wheel Right** (`KC_MS_WH_RIGHT`) | **Mouse Middle Click** (`KC_MS_BTN3`) | Wide timeline scrubbing, spreadsheets, diffs, autoscroll |
 
 ---
 
@@ -193,7 +201,7 @@ gmmk3linux/
                         ├── rules.mk
                         └── keymaps/
                             └── default/
-                                └── keymap.c # Multi-OS adaptive keymap & scanner
+                                └── keymap.c # Multi-OS adaptive keymap & knob engine
 ```
 
 ---
