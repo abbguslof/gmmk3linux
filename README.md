@@ -24,7 +24,8 @@ An open-source, ultra-low-latency QMK firmware replacement for the **Glorious GM
 * **No Glorious Core Required**: Full standalone hardware configuration, native dynamic lighting, and persistent on-board memory.
 * **Maximum Performance & Ultra-Low Latency**:
   * **1000Hz (1ms) USB Polling Rate** forced via hardware descriptor (`USB_POLLING_INTERVAL_MS 1`).
-  * **0ms Latency Eager Debouncing** (`sym_eager_pk`) registering instant keydown response on first switch contact.
+  * **0ms Actuation Latency + Chatter-Free Debouncing** (`asym_eager_defer_pk`): Instant 0ms keydown response on contact + 5ms deferred release to prevent double typing / chatter.
+  * **High-Speed Matrix Scanning**: Reduced `MATRIX_IO_DELAY` (10µs) and throttled RGB Matrix updates (60 FPS cap) to maximize MCU scanning cycles.
   * **True N-Key Rollover (NKRO)** forced active by default.
   * **Zero Debug Overhead**: Stripped serial logging and console polling for pure scanning throughput.
 * **Hardware 3-Position Slider Support**: Native matrix scanning of the rear slider switch dynamically selects OS profiles on the fly with RGB color confirmation.
