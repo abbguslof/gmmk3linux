@@ -35,7 +35,8 @@
 #define DEBOUNCE                                                               \
   5 // 5ms release defer filter with asym_eager_defer_pk (0ms keydown delay, 0 chatter)
 #define MATRIX_IO_DELAY                                                        \
-  20 // 20us I/O delay ensures clean electrical settling across traces while scanning at ~5000Hz
+  15 // 15us I/O delay ensures clean electrical settling across traces while scanning at ~5000Hz
+
 
 #define RGB_MATRIX_LED_FLUSH_LIMIT                                             \
   16 // Cap RGB flushes to 60 FPS to prevent bus throttling

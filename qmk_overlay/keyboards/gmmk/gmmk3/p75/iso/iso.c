@@ -209,7 +209,26 @@ void spi_init(void) {
 
 #endif
 
+static bool suspend_keys_were_released = false;
+
+void suspend_power_down_kb(void) {
+    suspend_keys_were_released = false;
+#if defined(AW20216S_EN_PIN)
+    gpio_write_pin_low(AW20216S_EN_PIN);
+#endif
+    suspend_power_down_user();
+}
+
+void suspend_wakeup_init_kb(void) {
+#if defined(AW20216S_EN_PIN)
+    gpio_write_pin_high(AW20216S_EN_PIN);
+#endif
+    suspend_wakeup_init_user();
+}
+
 bool suspend_wakeup_condition_kb(void) {
+    bool key_pressed = false;
+
     for (uint8_t r = 0; r < MATRIX_ROWS; r++) {
         matrix_row_t row = matrix_get_row(r);
         // Column 7 (bit 0x80) on Rows 11, 12, and 13 is the hardware 3-position OS slider switch.
@@ -217,7 +236,19 @@ bool suspend_wakeup_condition_kb(void) {
         if (r == 11 || r == 12 || r == 13) {
             row &= ~((matrix_row_t)1 << 7);
         }
-        if (row) return true;
+        if (row != 0) {
+            key_pressed = true;
+            break;
+        }
     }
-    return false;
+
+    if (!suspend_keys_were_released) {
+        // Only arm wakeup after all keys held before/during sleep entry (like Enter or Fn+Del) have been released
+        if (!key_pressed) {
+            suspend_keys_were_released = true;
+        }
+        return false;
+    }
+
+    return key_pressed;
 }

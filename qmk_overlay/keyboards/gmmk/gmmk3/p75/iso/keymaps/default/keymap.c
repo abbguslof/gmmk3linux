@@ -448,9 +448,10 @@ void keyboard_post_init_user(void) {
 
 // Non-blocking RGB matrix hook: solid dim minimal backlight per active OS profile
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-    if (!rgb_matrix_is_enabled()) {
-        return true;
+    if (!rgb_matrix_is_enabled() || rgb_matrix_get_suspend_state()) {
+        return false;
     }
+
 
     // 1. Momentary profile confirmation flash (active for 500ms after slider change)
     if (flash_timer != 0) {
