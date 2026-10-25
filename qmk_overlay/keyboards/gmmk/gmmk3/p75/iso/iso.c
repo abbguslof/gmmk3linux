@@ -208,3 +208,16 @@ void spi_init(void) {
 }
 
 #endif
+
+bool suspend_wakeup_condition_kb(void) {
+    for (uint8_t r = 0; r < MATRIX_ROWS; r++) {
+        matrix_row_t row = matrix_get_row(r);
+        // Column 7 (bit 0x80) on Rows 11, 12, and 13 is the hardware 3-position OS slider switch.
+        // It is physically held closed 24/7, which would otherwise trigger immediate remote wakeup on sleep.
+        if (r == 11 || r == 12 || r == 13) {
+            row &= ~((matrix_row_t)1 << 7);
+        }
+        if (row) return true;
+    }
+    return false;
+}

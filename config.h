@@ -33,10 +33,10 @@
 #define USB_POLLING_INTERVAL_MS 1 // 1000Hz (1ms) USB Polling Rate
 #define FORCE_NKRO                // Always active N-Key Rollover
 #define DEBOUNCE                                                               \
-  3 // 5ms release defer filter with asym_eager_defer_pk (0ms keydown delay, 0
-    // chatter)
+  5 // 5ms release defer filter with asym_eager_defer_pk (0ms keydown delay, 0 chatter)
 #define MATRIX_IO_DELAY                                                        \
-  10 // Lowered from default 30us to 10us for ultra-fast matrix scanning
+  20 // 20us I/O delay ensures clean electrical settling across traces while scanning at ~5000Hz
+
 #define RGB_MATRIX_LED_FLUSH_LIMIT                                             \
   16 // Cap RGB flushes to 60 FPS to prevent bus throttling
 #define RGB_MATRIX_LED_PROCESS_LIMIT                                           \
@@ -47,3 +47,5 @@
 
 /* Power Management */
 #define RGB_MATRIX_SLEEP // Shut down LEDs when USB host suspends/sleeps
+#define USB_SUSPEND_WAKEUP_DELAY 200 // Allow USB hubs and host bus to settle on resume to prevent desync
+

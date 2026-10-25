@@ -66,6 +66,10 @@ The physical 3-position rear slider is actually wired directly into **Column 7**
 
 A non-blocking matrix scanner in `housekeeping_task_user()` samples Rows 11, 12, and 13 every 25ms, dynamically activating the appropriate base layer and firing a visual RGB confirmation flash before settling into the profile's solid dim ambient backlight.
 
+> [!IMPORTANT]
+> **Linux Suspend / Sleep Fix**: Because the physical slider switch is permanently closed on Row 11, 12, or 13, standard QMK firmware interprets this as a key being held down 24/7. Upon system sleep (`systemctl suspend`), standard QMK immediately triggers USB Remote Wakeup, causing the PC to instantly wake up within milliseconds and desyncing the USB stack on WB32 chips. This firmware implements `suspend_wakeup_condition_kb()` to mask Column 7 on Rows 11–13, allowing your PC to sleep peacefully while still waking up when any real key is pressed.
+
+
 ---
 
 ## ⌨️ Layout & Profiles
@@ -317,12 +321,20 @@ gmmk3linux/
 
 ## 🆘 Troubleshooting & Recovery
 
+* **PC immediately wakes up on `systemctl suspend` / keyboard freezes after sleep**:
+  This happens when the host allows USB wakeups and the firmware does not mask the rear 3-position slider switch (which is physically closed 24/7 in the matrix).
+  * **Fix 1 (Firmware)**: Build and flash the latest firmware (`make flash`). It masks Column 7 on rows 11–13 during suspend and introduces `USB_SUSPEND_WAKEUP_DELAY` (200ms) to ensure USB hubs settle smoothly.
+  * **Fix 2 (Linux OS / Udev)**: If you never want this keyboard to wake the PC from sleep (e.g. to prevent accidental bumps or pet wakeups), disable wakeup in udev:
+    ```bash
+    echo 'ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="504b", ATTR{idProduct}=="320f", TEST=="power/wakeup", ATTR{power/wakeup}="disabled"' | sudo tee -a /etc/udev/rules.d/99-gmmk3-pro.rules
+    sudo udevadm control --reload-rules && sudo udevadm trigger
+    ```
 * **Keyboard unresponsive / stuck in bootloader**:
   Run `wb32-dfu-updater_cli -R` to trigger a software reset, or reconnect the USB cable.
 * **Reset EEPROM (Clear VIA remappings)**:
   Press **Fn + Backspace** (`EE_CLR`), then replug the board.
 * **Force Bootloader on Plug-in**:
-  Unplug the USB cable, hold down the physical `Esc` key, and reconnect the cable.
+  Unplug the USB cable, hold down the physical `Esc` key (or `Space + B`), and reconnect the cable.
 
 ---
 

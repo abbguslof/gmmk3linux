@@ -5,6 +5,9 @@ SUBSYSTEM=="hidraw", ATTRS{idVendor}=="504b", ATTRS{idProduct}=="320f", MODE="06
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="504b", ATTRS{idProduct}=="320f", MODE="0666", TAG+="uaccess"
 ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="504b", ATTR{idProduct}=="320f", TEST=="power/control", ATTR{power/control}="on"
 ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="504b", ATTR{idProduct}=="320f", TEST=="power/autosuspend", ATTR{power/autosuspend}="-1"
+# Optional: Uncomment if you want to completely disable USB sleep wakeups from this keyboard
+# ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="504b", ATTR{idProduct}=="320f", TEST=="power/wakeup", ATTR{power/wakeup}="disabled"
+
 
 # 2. Westberry WB32 DFU Bootloader (Flashing via wb32-dfu-updater_cli & dfu-util)
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="342d", ATTRS{idProduct}=="dfa0", MODE="0666", TAG+="uaccess"
