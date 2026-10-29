@@ -209,10 +209,10 @@ void spi_init(void) {
 
 #endif
 
-static bool suspend_keys_were_released = false;
+static uint8_t suspend_idle_scans = 0;
+#define SUSPEND_ARM_THRESHOLD 15 // ~255ms of clean continuous key release before arming remote wakeup
 
 void suspend_power_down_kb(void) {
-    suspend_keys_were_released = false;
 #if defined(AW20216S_EN_PIN)
     gpio_write_pin_low(AW20216S_EN_PIN);
 #endif
@@ -220,6 +220,7 @@ void suspend_power_down_kb(void) {
 }
 
 void suspend_wakeup_init_kb(void) {
+    suspend_idle_scans = 0;
 #if defined(AW20216S_EN_PIN)
     gpio_write_pin_high(AW20216S_EN_PIN);
 #endif
@@ -242,13 +243,19 @@ bool suspend_wakeup_condition_kb(void) {
         }
     }
 
-    if (!suspend_keys_were_released) {
-        // Only arm wakeup after all keys held before/during sleep entry (like Enter or Fn+Del) have been released
-        if (!key_pressed) {
-            suspend_keys_were_released = true;
+    if (key_pressed) {
+        if (suspend_idle_scans >= SUSPEND_ARM_THRESHOLD) {
+            // Wakeup is properly armed after entering sleep and a real key was deliberately pressed
+            return true;
+        }
+        // Key is still held or bouncing during sleep entry: hold arm counter at 0
+        suspend_idle_scans = 0;
+        return false;
+    } else {
+        // All real keys released: accumulate continuous quiet scans (~17ms per scan)
+        if (suspend_idle_scans < SUSPEND_ARM_THRESHOLD) {
+            suspend_idle_scans++;
         }
         return false;
     }
-
-    return key_pressed;
 }

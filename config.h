@@ -33,9 +33,9 @@
 #define USB_POLLING_INTERVAL_MS 1 // 1000Hz (1ms) USB Polling Rate
 #define FORCE_NKRO                // Always active N-Key Rollover
 #define DEBOUNCE                                                               \
-  5 // 5ms release defer filter with asym_eager_defer_pk (0ms keydown delay, 0 chatter)
+  6 // 6ms symmetric defer per-key filter (sym_defer_pk) completely eliminates contact bounce/double-typing on press & release
 #define MATRIX_IO_DELAY                                                        \
-  15 // 15us I/O delay ensures clean electrical settling across traces while scanning at ~5000Hz
+  30 // 30us I/O delay ensures clean electrical settling across traces while scanning at ~2000Hz
 
 
 #define RGB_MATRIX_LED_FLUSH_LIMIT                                             \

@@ -15,7 +15,7 @@ RGB_MATRIX_ENABLE = yes     # Per-key addressable RGB Matrix enabled
 DIP_SWITCH_ENABLE = no      # Disabled (3-position switch is matrix-scanned via housekeeping)
 
 # Performance & Latency Tuning
-DEBOUNCE_TYPE = asym_eager_defer_pk
+DEBOUNCE_TYPE = sym_defer_pk
 FORCE_NKRO = yes
 
 # Dynamic Keymap & VIA WebHID
