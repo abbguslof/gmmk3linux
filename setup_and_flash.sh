@@ -23,6 +23,7 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 QMK_DIR="${HOME}/qmk_gmmk3"
 UPSTREAM_REPO="https://gitlab.com/glorious-public/qmk_firmware.git"
 UPSTREAM_BRANCH="gmmk3_p75_ansi_iso_wired"
+UPSTREAM_COMMIT="121e1a6341c5c045b396dab8c5e755a4b9a4aefd"
 BIN_NAME="gmmk_gmmk3_p75_iso_default.bin"
 FLASH_MODE=false
 INSTALL_UDEV=false
@@ -112,11 +113,35 @@ if [ "$FLASH_MODE" = true ]; then
     fi
 fi
 
-# Clone or verify QMK directory
-if [ ! -d "${QMK_DIR}" ]; then
+# Clone or verify QMK directory at the pinned commit
+if [ -e "${QMK_DIR}" ] && [ ! -d "${QMK_DIR}/.git" ]; then
+    log_error "${QMK_DIR} exists but is not a git checkout. Move it aside and rerun."
+    exit 1
+fi
+
+if [ ! -d "${QMK_DIR}/.git" ]; then
     log_info "Cloning Glorious QMK repository (${UPSTREAM_BRANCH})..."
     git clone --depth 1 -b "${UPSTREAM_BRANCH}" "${UPSTREAM_REPO}" "${QMK_DIR}"
 fi
+
+# The overlay edits tracked files. Restore them before switching commits.
+git -C "${QMK_DIR}" checkout -- .
+
+if [ "$(git -C "${QMK_DIR}" rev-parse HEAD)" != "${UPSTREAM_COMMIT}" ]; then
+    log_info "Checking out pinned upstream commit ${UPSTREAM_COMMIT:0:12}..."
+    if ! git -C "${QMK_DIR}" fetch --depth 1 origin "${UPSTREAM_COMMIT}"; then
+        log_warn "Direct fetch failed, fetching the full branch..."
+        git -C "${QMK_DIR}" fetch --unshallow origin || true
+    fi
+    if ! git -C "${QMK_DIR}" checkout --detach "${UPSTREAM_COMMIT}"; then
+        log_error "Could not check out ${UPSTREAM_COMMIT}. Remove ${QMK_DIR} and rerun."
+        exit 1
+    fi
+fi
+
+log_info "Upstream commit: $(git -C "${QMK_DIR}" rev-parse --short HEAD)"
+log_info "QMK CLI: $(qmk --version 2>/dev/null | head -n1)"
+log_info "Compiler: $(arm-none-eabi-gcc --version | head -n1)"
 
 # Configure QMK home
 qmk config user.qmk_home="${QMK_DIR}" >/dev/null
@@ -154,8 +179,8 @@ if [ "$FLASH_MODE" = true ]; then
     echo -e "\n${BOLD}================================================================${RESET}"
     echo -e "${YELLOW}${BOLD}Ready to Flash!${RESET}"
     echo -e "Put your keyboard into DFU Bootloader mode now:"
-    echo -e "  1. Press ${BOLD}Fn + Esc${RESET} on the keyboard (software jump), OR"
-    echo -e "  2. Unplug USB cable, hold ${BOLD}Space + B${RESET} (recommended) or ${BOLD}Esc${RESET}, and reconnect the cable."
+    echo -e "  1. Press ${BOLD}Fn + Esc${RESET} on the keyboard (keeps VIA remaps), OR"
+    echo -e "  2. Unplug USB cable, hold ${BOLD}Esc${RESET}, and reconnect the cable (Bootmagic; clears VIA remaps)."
     echo -e "     ${CYAN}• Note: When DFU engages, the keyboard becomes unresponsive and ALL lights remain off.${RESET}"
     echo -e "Waiting for WB32 DFU device..."
     echo -e "${BOLD}================================================================${RESET}\n"
@@ -166,6 +191,6 @@ else
     echo -e "\nTo flash to your keyboard, run the flash command ${BOLD}FIRST${RESET} (so you don't need a second keyboard):"
     echo -e "  ${BOLD}./setup_and_flash.sh --flash${RESET}"
     echo -e "Then put the keyboard into DFU mode while the script waits:"
-    echo -e "  • Reconnect USB while holding ${BOLD}Space + B${RESET} (recommended) or press ${BOLD}Fn + Esc${RESET}"
+    echo -e "  • Reconnect USB while holding ${BOLD}Esc${RESET}, or press ${BOLD}Fn + Esc${RESET} if the keyboard still types"
     echo -e "  • The keyboard will turn off all lights and become unresponsive until flashing completes.\n"
 fi

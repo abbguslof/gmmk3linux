@@ -209,10 +209,27 @@ void spi_init(void) {
 
 #endif
 
-static uint8_t suspend_idle_scans = 0;
-#define SUSPEND_ARM_THRESHOLD 15 // ~255ms of clean continuous key release before arming remote wakeup
+#define SUSPEND_ARM_SCANS 15     // ~255ms at the 17ms suspend loop cadence
+#define SUSPEND_ENTRY_GAP_MS 100 // A gap this long between power-down calls means a new suspend entry
+
+static uint16_t     suspend_loop_timer   = 0;
+static uint8_t      suspend_settle_scans = 0;
+static matrix_row_t suspend_released     = 0;
+
+static void suspend_state_reset(void) {
+    suspend_settle_scans = 0;
+    suspend_released     = 0;
+}
 
 void suspend_power_down_kb(void) {
+    uint16_t now = timer_read();
+    // power_down_kb runs every suspend loop iteration. A long gap means the host
+    // woke and is suspending again, even if the wakeup hook never ran.
+    if (timer_elapsed(suspend_loop_timer) > SUSPEND_ENTRY_GAP_MS) {
+        suspend_state_reset();
+    }
+    suspend_loop_timer = now;
+
 #if defined(AW20216S_EN_PIN)
     gpio_write_pin_low(AW20216S_EN_PIN);
 #endif
@@ -220,7 +237,8 @@ void suspend_power_down_kb(void) {
 }
 
 void suspend_wakeup_init_kb(void) {
-    suspend_idle_scans = 0;
+    suspend_state_reset();
+    suspend_loop_timer = timer_read();
 #if defined(AW20216S_EN_PIN)
     gpio_write_pin_high(AW20216S_EN_PIN);
 #endif
@@ -228,34 +246,27 @@ void suspend_wakeup_init_kb(void) {
 }
 
 bool suspend_wakeup_condition_kb(void) {
-    bool key_pressed = false;
+    matrix_row_t pressed = 0;
 
     for (uint8_t r = 0; r < MATRIX_ROWS; r++) {
         matrix_row_t row = matrix_get_row(r);
-        // Column 7 (bit 0x80) on Rows 11, 12, and 13 is the hardware 3-position OS slider switch.
-        // It is physically held closed 24/7, which would otherwise trigger immediate remote wakeup on sleep.
+        // Column 7 (bit 0x80) on rows 11, 12, and 13 is the rear 3-position OS
+        // slider. One position stays closed all the time, so it can never count
+        // as a deliberate wake key.
         if (r == 11 || r == 12 || r == 13) {
             row &= ~((matrix_row_t)1 << 7);
         }
-        if (row != 0) {
-            key_pressed = true;
-            break;
-        }
+        pressed |= row;
     }
 
-    if (key_pressed) {
-        if (suspend_idle_scans >= SUSPEND_ARM_THRESHOLD) {
-            // Wakeup is properly armed after entering sleep and a real key was deliberately pressed
-            return true;
-        }
-        // Key is still held or bouncing during sleep entry: hold arm counter at 0
-        suspend_idle_scans = 0;
-        return false;
-    } else {
-        // All real keys released: accumulate continuous quiet scans (~17ms per scan)
-        if (suspend_idle_scans < SUSPEND_ARM_THRESHOLD) {
-            suspend_idle_scans++;
-        }
+    // Remember every position seen released since suspend entry. A key held
+    // while the host suspends must be released and pressed again to wake.
+    suspend_released |= (matrix_row_t)~pressed;
+
+    if (suspend_settle_scans < SUSPEND_ARM_SCANS) {
+        suspend_settle_scans++;
         return false;
     }
+
+    return (pressed & suspend_released) != 0;
 }

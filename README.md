@@ -1,85 +1,58 @@
-# Glorious GMMK 3 Pro 75% ISO (WB32) — Custom Linux Firmware
+# GMMK 3 Pro 75% ISO Linux firmware
 
-```text
-   ______ __  __ __  __ _  __ _____     ____  ____   ___        ____ _____ ____ 
-  / ____// / / //  |/  // |/ //__  /    / __ \/ __ \ / _ \      /  _// ___// __ \
- / / __ / / / // /|_/ // /|_/ / / /    / /_/ / /_/ // / / /     / /  \__ \/ / / /
-/ /_/ // /_/ // /  / // /  / / / /__  / ____// _, _// /_/ /   _/ /  ___/ / /_/ / 
-\____/ \____//_/  /_//_/  /_/ /____/ /_/    /_/ |_| \____/   /___/ /____/\____/  
-```
+A QMK firmware replacement for the **Glorious GMMK 3 Pro 75% ISO (wired, non-HE)**. It runs on the Westberry WB32FQ95 and gives you the full keyboard without Glorious Core: four layers, a rear profile slider, a context-aware encoder, per-key RGB, VIA WebHID, and a suspend policy that keeps the host asleep.
 
-[![Firmware](https://img.shields.io/badge/firmware-QMK-blue.svg)](https://qmk.fm)
-[![Platform](https://img.shields.io/badge/MCU-Westberry%20WB32FQ95-orange.svg)](https://www.westberrytech.com/)
-[![OS](https://img.shields.io/badge/OS-Arch%20Linux%20%7C%20Hyprland-blueviolet.svg)](https://archlinux.org)
-[![Layout](https://img.shields.io/badge/layout-Swedish%20ISO%2075%25-green.svg)](#-layout--profiles)
-[![VIA](https://img.shields.io/badge/configurator-VIA%20v3%20WebHID-red.svg)](https://usevia.app)
-[![License](https://img.shields.io/badge/license-GPL--2.0-yellow.svg)](LICENSE)
+The firmware is built and tested on Arch Linux with a Swedish ISO board. The macOS and Windows layers are included but not verified on this release.
 
-An open-source, ultra-low-latency QMK firmware replacement for the **Glorious GMMK 3 Pro 75% ISO (Wired, Non-HE)** keyboard powered by the **Westberry WB32FQ95** MCU. Designed to give complete control without Glorious Core software, tailored for Arch Linux, Hyprland, and multi-OS workflows.
+> [!WARNING]
+> Flashing replaces the vendor firmware. A bad flash can leave the keyboard in DFU until you recover it. Read the recovery section before you flash. No warranty.
 
----
+## What you get
 
-## ⚡ Highlights
+| Feature | Setting |
+| :--- | :--- |
+| USB polling | 1000 Hz (`USB_POLLING_INTERVAL_MS 1`) |
+| Key press | Reported on the first scan (`asym_eager_defer_pk`) |
+| Key release | Deferred until contact is stable for 8 ms (`DEBOUNCE 8`) |
+| Matrix scan | Roughly 2 kHz (`MATRIX_IO_DELAY 30`) |
+| RGB update | About 60 Hz (`RGB_MATRIX_LED_FLUSH_LIMIT 16`) |
+| Rollover | NKRO always on (`FORCE_NKRO`) |
+| Layers | 4: Linux, macOS, Windows, Fn |
+| Profiles | Rear 3-position slider, scanned from matrix column 7 |
+| Encoder | Context-aware rotation and click |
+| Configurator | VIA v3 WebHID |
 
-* **No Glorious Core Required**: Full standalone hardware configuration, native dynamic lighting, and persistent on-board memory.
-* **Maximum Performance & Ultra-Low Latency**:
-  * **1000Hz (1ms) USB Polling Rate** forced via hardware descriptor (`USB_POLLING_INTERVAL_MS 1`).
-  * **0ms Actuation Latency + Chatter-Free Debouncing** (`asym_eager_defer_pk`): Instant 0ms keydown response on contact + 5ms deferred release to prevent double typing / chatter.
-  * **High-Speed Matrix Scanning**: Reduced `MATRIX_IO_DELAY` (10µs) and throttled RGB Matrix updates (60 FPS cap) to maximize MCU scanning cycles.
-  * **True N-Key Rollover (NKRO)** forced active by default.
-  * **Zero Debug Overhead**: Stripped serial logging and console polling for pure scanning throughput.
-* **Hardware 3-Position Slider Support**: Native matrix scanning of the rear slider switch dynamically selects OS profiles on the fly with RGB color confirmation.
-* **Context-Aware Productivity Encoder**: High-speed scrubber, word navigator, tab manager, window controller, and mouse emulation tool (no volume dial).
-* **Full VIA v3 WebHID Compatibility**: Edit keymaps and layers live in Chromium or [usevia.app](https://usevia.app) using the included Swedish ISO definitions.
-* **1-Click Build & Flash**: Automated environment setup, submodule checkouts, compilation, and bootloader flashing.
+The debounce choice is a tradeoff. A press is reported before the debounce window, so keydown latency stays low. A release waits 8 ms for the contact to settle, which filters most release chatter. A tap shorter than 8 ms can be stretched to about 16 ms. See [Chatter tuning](#chatter-tuning).
 
----
+## Hardware
 
-## 🛠️ Hardware Discoveries & Architecture
+- Keyboard: Glorious GMMK 3 Pro 75% ISO, wired, non-HE.
+- MCU: Westberry WB32FQ95, ARM Cortex-M3.
+- USB: `504b:320f`.
+- Bootloader: Westberry `wb32-dfu`. Use `wb32-dfu-updater_cli`, not STM32 or Atmel DFU tools.
 
-### 1. Westberry WB32FQ95 & Bootloader Toolchain
-* **Microcontroller**: Westberry **WB32FQ95** (ARM Cortex-M3 core).
-* **Bootloader Protocol**: Custom USB DFU implementation (`wb32-dfu`). Requires `wb32-dfu-updater_cli` instead of standard STM32/Atmel DFU tools.
-* **Bootloader Entry**: Press **Fn + Esc** in firmware, or hold the physical **Esc** key while plugging in the USB cable.
+The ANSI, wireless, and HE versions need different firmware. The keymap and VIA definitions here describe the Swedish ISO layout.
 
-### 2. The 3-Position Hardware Slider Discovery
-Upstream vendor firmware erroneously configured `#define DIP_SWITCH_PINS { A13 }`. On WB32 chips, `A13` is the hardware `SWDIO/JTAG` debug interface, causing direct GPIO reads to fail.
+## Slider and profiles
 
-The physical 3-position rear slider is actually wired directly into **Column 7** of the keyboard matrix:
+The vendor firmware configured the rear slider as `DIP_SWITCH_PINS { A13 }`. On the WB32, A13 is the SWDIO/JTAG pin, so that read fails. The slider is wired into matrix **column 7**: each position closes column 7 to one row.
 
-```text
-┌────────────────────────────────────────────────────────────────────────┐
-│                        REAR HARDWARE SLIDER                            │
-│                                                                        │
-│         [Pos 1: Left]             [Pos 2: Mid]           [Pos 3: Right]│
-│             ●───────○────────○                   ○────────○───────●    │
-│                │                       │                     │         │
-│                ▼                       ▼                     ▼         │
-│           ARCH LINUX                 macOS                WINDOWS      │
-│      • Caps Lock: · (middle)   • Opt ↔ Cmd swapped   • Standard Win ISO│
-│      • Hyprland Focus & Kill   • Mac Shortcuts       • Win Shortcuts   │
-│      • Matrix: [Row 11, Col 7] • Matrix: [12, Col 7] • Matrix: [13, 7]│
-│      • Ambient: Dim Grey/White • Ambient: Warm Amber • Ambient: DeepBlu│
-│      • [RGB Flash: Cyan]       • [RGB Flash: White]  • [Flash: Purple] │
-└────────────────────────────────────────────────────────────────────────┘
-```
+| Slider | Profile | Layer | Matrix | Ambient | Switch flash |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Left | Arch Linux | `PROF_LINUX` (0) | `[11, 7]` | Dim neutral (30, 32, 35) | Cyan |
+| Middle | macOS | `PROF_MAC` (1) | `[12, 7]` | Dim amber (45, 26, 8) | White |
+| Right | Windows | `PROF_WIN` (2) | `[13, 7]` | Dim blue (10, 25, 55) | Purple |
 
-A non-blocking matrix scanner in `housekeeping_task_user()` samples Rows 11, 12, and 13 every 25ms, dynamically activating the appropriate base layer and firing a visual RGB confirmation flash before settling into the profile's solid dim ambient backlight.
+`housekeeping_task_user()` samples the three rows every 25 ms and sets the default layer. A 500 ms RGB flash confirms the change. The slider stays electrically closed, so every suspend path must mask column 7 on rows 11 to 13. See [ADR 0001](docs/adr/0001-slider-matrix-mapping.md).
 
-> [!IMPORTANT]
-> **Linux Suspend / Sleep Fix**: Because the physical slider switch is permanently closed on Row 11, 12, or 13, standard QMK firmware interprets this as a key being held down 24/7. Upon system sleep (`systemctl suspend` / `systemctl sleep`), standard QMK immediately triggers USB Remote Wakeup. Furthermore, releasing the `Enter` key right as sleep begins can falsely trigger remote wakeup if unshielded. This firmware masks Column 7 on Rows 11–13 and enforces a ~255ms clean idle settling guard (`suspend_idle_scans >= 15`) before arming wakeup, ensuring your PC sleeps peacefully while still allowing you to wake it by deliberately pressing any key.
+## Layout
 
-
----
-
-## ⌨️ Layout & Profiles
-
-### Physical Layout: 75% ISO Swedish (Arch Linux Profile 1)
+Physical layout, Swedish ISO:
 
 ```text
 ┌───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐    ┌───────┐
 │Esc│ │F1 │F2 │F3 │F4 │ │F5 │F6 │F7 │F8 │ │F9 │F10│F11│F12│    │ KNOB  │
-└───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘    │ ↺ ↻ 🔘│
+└───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘    │ ↺ ↻ O │
 ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐    └───────┘
 │ § │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │ 8 │ 9 │ 0 │ + │ ´ │Backsp │    ┌───────┐
 ├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤    │  Del  │
@@ -93,122 +66,83 @@ A non-blocking matrix scanner in `housekeeping_task_user()` samples Rows 11, 12,
 └────┴────┴────┴────────────────────────┴────┴────┘ └───┴───┴────┘
 ```
 
-* **Position 1 (Arch Linux)**: Base layer 0 (`PROF_LINUX`). Caps Lock is customized to Swedish middle dot (`·` via `RALT(KC_DOT)`). Ambient lighting: **Solid Dim Neutral White / Grey** (with instant Cyan flash confirmation on switch).
-* **Position 2 (macOS)**: Base layer 1 (`PROF_MAC`). Left Option and Command are swapped for natural macOS muscle memory. Ambient lighting: **Solid Dim Warm Amber / Candlelight** (with instant White flash confirmation on switch).
-* **Position 3 (Windows)**: Base layer 2 (`PROF_WIN`). Standard Windows ISO modifiers. Ambient lighting: **Solid Dim Subtle Deep Blue** (with instant Purple flash confirmation on switch).
+The Linux profile maps Caps Lock to the Swedish middle dot (`RALT(KC_DOT)`). The macOS profile swaps Left Option and Left Command. The Windows profile uses the standard ISO modifiers.
 
-*(Minimalist design: no rainbow RGB or animated distractions — pure solid faint backlight for night reading).*
+### Fn layer
 
----
-
-### Shared Function Layer (`SHARED_FN` / Layer 3)
-
-Hold `Fn` (`MO(SHARED_FN)`) to access media, navigation, system controls, and programming symbols:
+Hold `Fn` for media, navigation, system keys, and RGB controls.
 
 ```text
 ┌───────┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐ ┌───┬───┬───┬───┐    ┌───────┐
-│QK_BOOT│ │MyC│Hom│Cal│Sel│ │Prv│Nxt│Ply│Stp│ │Mut│Vo-│Vo+│PSc│    │ MOUSE │
-└───────┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘    │ ↺ ↻ 🔘│
+│ BOOT  │ │MyC│Hom│Cal│Sel│ │Prv│Nxt│Ply│Stp│ │Mut│Vo-│Vo+│PSc│    │ CLICK │
+└───────┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘ └───┴───┴───┴───┘    │ ↺ ↻ O │
 ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───────┐    └───────┘
-│   │   │   │   │   │   │   │ { │ [ │ ] │ } │ \ │   │EE_CLR │    ┌───────┐
-├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤    │FN_SLEP│
+│   │   │   │   │   │   │   │ { │ [ │ ] │ } │ \ │   │ EE_CLR│    ┌───────┐
+├───┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─────┤    │SLEEP  │
 │RTOG │   │   │   │   │   │   │Hom│ ↑ │End│   │   │ ~ │Ent  │    ├───────┤
 ├─────┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┬──┴┐   │    │       │
 │CapsLk│   │   │   │   │   │ ← │ ↓ │ ↑ │ → │   │   │   │   │    ├───────┤
 ├────┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴─┬─┴───┴┬───┤    │       │
 │    │ | │SAD│SAI│SPD│SPI│   │   │   │   │   │   │       │VAI│    ├───────┤
 ├────┼───┴┬──┴─┬─┴───┴───┴───┴───┴───┴──┬┴───┼───┴┬─┬───┼───┼────┤       │
-│    │GUI │   │         Play/Pause      │    │    │ │RMOD│VAD│MOD │└───────┘
-└────┴────┴────┴────────────────────────┴────┴────┘ └───┴───┴────┘
+│    │GUI │    │        Play/Pause        │    │    │ │RMOD│VAD│MOD │└───────┘
+└────┴────┴────┴─────────────────────────┴────┴────┘ └───┴───┴────┘
 ```
 
-#### ⌨️ Fn Layer Quick Reference Table
+| Keys | Action |
+| :--- | :--- |
+| `Esc` | `QK_BOOT`, enter the bootloader. VIA remaps are kept. |
+| `Del` | `FN_SLEP`, system sleep. Linux and Windows send `KC_SLEP`; macOS sends Command + Option + Eject. |
+| `Backspace` | `EE_CLR`, clear dynamic keymap EEPROM. |
+| `F1` to `F4` | My Computer, browser home, calculator, media select. |
+| `F5` to `F9` | Previous, next, play, stop, mute. |
+| `F10`, `F11` | Volume down, volume up. |
+| `F12` | Print Screen. |
+| `7`, `8`, `9`, `0`, `+` | `{`, `[`, `]`, `}`, `\`. |
+| `¨` | `~`. |
+| `<>` | `|`. |
+| `H`, `J`, `K`, `L` | Left, down, up, right. |
+| `U`, `I`, `O` | Home, up, end. |
+| `Tab` | Toggle RGB. |
+| `Z`, `X` | Saturation down, saturation up. |
+| `C`, `V` | Speed down, speed up. |
+| `Up`, `Down` | Brightness up, brightness down. |
+| `Left`, `Right` | Previous effect, next effect. |
+| `Super` | `GU_TOGG`, toggle the GUI key. |
+| `Space` | Play/pause. |
 
-| Key Cluster | Keys | Action / Feature |
-| :--- | :--- | :--- |
-| **System & Sleep** | `Esc`, `Del`, `Backspace` | `Esc` (DFU Bootloader), `Del` (Universal OS Sleep), `Backspace` (EEPROM Reset) |
-| **App & System** | `F1` – `F4` | `F1` (My Computer), `F2` (Browser Home), `F3` (Calculator), `F4` (Media Player) |
-| **Media Playback** | `F5` – `F9`, `Space` | `F5` (Prev Track), `F6` (Next Track), `F7` (Play), `F8` (Stop), `F9` (Mute), `Space` (Play/Pause) |
-| **Audio Volume** | `F10` – `F11` | `F10` (Volume Down), `F11` (Volume Up) |
-| **PrintScreen** | `F12` | Instant Screen Capture (`PrintScreen`) |
-| **Brackets & Syntax** | `7`, `8`, `9`, `0`, `+`, `\`, `<` | Swedish ISO programmer symbols (`{ [ ] } \ \|`) |
-| **Navigation & Vim** | `H`, `J`, `K`, `L`, `U`, `I`, `O` | Vim navigation (`← ↓ ↑ →`), `Home`, `End` |
-| **Hardware RGB Controls** | `Tab`, `Z`, `X`, `C`, `V`, Arrow Cluster | Toggle (`Tab`), Saturation (`Z`/`X`), Speed (`C`/`V`), Brightness (`↑`/`↓`), Mode Prev/Next (`←`/`→`) |
-| **Windows GUI Lock** | `Super` (`GU_TOGG`) | Lock / unlock Windows key (`Super`) |
+`Fn + Esc` enters DFU. The keyboard stops typing and turns off the RGB. The flash script waits for it.
 
-* **Built-in OS Sleep Key (`Fn + Del`)**:
-  * **Linux / Windows**: Triggers universal ACPI system sleep (`KC_SLEP` / systemd suspend).
-  * **macOS**: Triggers native immediate sleep (`Cmd + Option + Eject`).
-* **EE_CLR (`Fn + Backspace`)**: Resets dynamic VIA EEPROM memory back to firmware defaults.
+## Encoder
 
----
+| Modifier | Counter-clockwise | Clockwise | Click |
+| :--- | :--- | :--- | :--- |
+| None | Left arrow | Right arrow | Pause / mic mute |
+| Shift | Undo (`Ctrl+Z` or `Cmd+Z`) | Redo (`Ctrl+Y` or `Cmd+Shift+Z`) | Save (`Ctrl+S` or `Cmd+S`) |
+| Ctrl | Zoom out (`Ctrl+-` or `Cmd+-`) | Zoom in (`Ctrl++` or `Cmd++`) | Reset zoom (`Ctrl+0` or `Cmd+0`) |
+| Alt | Previous word (`Ctrl+Left` or `Opt+Left`) | Next word (`Ctrl+Right` or `Opt+Right`) | Select word (`Ctrl+D` or `Cmd+D`) |
+| Shift + Alt | Previous tab (`Ctrl+Shift+Tab`) | Next tab (`Ctrl+Tab`) | Close tab (`Ctrl+W` or `Cmd+W`) |
+| Super | Focus left (profile-specific) | Focus right (profile-specific) | Close window (profile-specific) |
+| Fn | Mouse up | Mouse down | Left click |
+| Fn + Shift | Mouse left | Mouse right | Right click |
+| Fn + Alt | Horizontal wheel left | Horizontal wheel right | Middle click |
 
-## 🎛️ Rotary Encoder & Knob Switch Matrix
+The Linux Super bindings assume Hyprland: `Super+Left`, `Super+Right`, and `Super+W`. The macOS bindings are `Cmd+Shift+Tab`, `Cmd+Tab`, and `Cmd+Q`. The Windows bindings are `Alt+Shift+Tab`, `Alt+Tab`, and `Alt+F4`.
 
-```text
-                     ┌────────────────────────┐
-                     │   ROTARY KNOB MODES    │
-                     └───────────┬────────────┘
-                                 │
-           ┌─────────────────────┼─────────────────────┐
-           │                     │                     │
-           ▼                     ▼                     ▼
-     [ DEFAULT ]             [ SHIFT ]              [ CTRL ]
-   ↺ : Step Left (←)      ↺ : Undo (Ctrl+Z)      ↺ : Zoom Out (-)
-   ↻ : Step Right (→)     ↻ : Redo (Ctrl+Y)      ↻ : Zoom In (+)
-   🔘: Mic Mute (PAUS)    🔘: Save File (Ctrl+S) 🔘: Reset 100% (0)
-           │                     │                     │
-           ├─────────────────────┼─────────────────────┤
-           │                     │                     │
-           ▼                     ▼                     ▼
-      [  ALT  ]           [ SHIFT + ALT ]          [ SUPER ]
-   ↺ : Prev Word          ↺ : Prev Tab           ↺ : Focus Left (←)
-   ↻ : Next Word          ↻ : Next Tab           ↻ : Focus Right (→)
-   🔘: Select Word (C+D)  🔘: Close Tab (C+W)    🔘: Kill Window (S+W)
-           │
-           └─────────────────────┬─────────────────────┐
-                                 │
-                                 ▼
-                         [ FN (MOUSE MODE) ]
-                   Fn Alone   : ↺ Cursor Up   ↻ Cursor Down   🔘 Left Click
-                   Fn + Shift : ↺ Cursor Left ↻ Cursor Right  🔘 Right Click
-                   Fn + Alt   : ↺ Scroll Left ↻ Scroll Right  🔘 Middle Click
-```
+The default click sends `KC_PAUS`. Bind Pause to your microphone mute command in Hyprland if you use that workflow.
 
-### Base Profiles (Linux / macOS / Windows)
+## Install
 
-| State / Modifiers | Turn CCW (↺) | Turn CW (↻) | Knob Click (🔘) | Workflow |
-| :--- | :--- | :--- | :--- | :--- |
-| **Default (None)** | **Step Backward** (`Left Arrow`) | **Step Forward** (`Right Arrow`) | **Hardware Pause / Mic Mute** (`KC_PAUS`) | Video scrubbing (DaVinci/YouTube), timeline navigation, Hyprland mic toggle |
-| **Shift** | **Undo** (`Ctrl+Z` / `Cmd+Z`) | **Redo** (`Ctrl+Y` / `Cmd+Shift+Z`) | **Save File** (`Ctrl+S` / `Cmd+S`) | Document history stepping & instant save |
-| **Ctrl** | **Zoom Out** (`Ctrl+-` / `Cmd+-`) | **Zoom In** (`Ctrl++` / `Cmd++`) | **Reset Zoom 100%** (`Ctrl+0` / `Cmd+0`) | Universal display scaling across browsers, IDEs, and terminals |
-| **Alt** | **Previous Word** (`Ctrl+Left` / `Opt+Left`) | **Next Word** (`Ctrl+Right` / `Opt+Right`) | **Select Word / Token** (`Ctrl+D` / `Cmd+D`) | Fast code/text navigation & multi-cursor expansion |
-| **Shift + Alt** | **Previous Tab** (`Ctrl+Shift+Tab`) | **Next Tab** (`Ctrl+Tab`) | **Close Active Tab** (`Ctrl+W` / `Cmd+W`) | Browser & editor tab cycling and closing |
-| **Super (GUI)** | **Focus Left** (`Super+Left`)<br>*(macOS: `Cmd+Shift+Tab`)*<br>*(Win: `Alt+Shift+Tab`)* | **Focus Right** (`Super+Right`)<br>*(macOS: `Cmd+Tab`)*<br>*(Win: `Alt+Tab`)* | **Kill Active Window** (`Super+W`)<br>*(macOS: `Cmd+Q`)*<br>*(Win: `Alt+F4`)* | Native Hyprland Omarchy window navigation & close without lifting hands |
-
-### Function Layer (`Fn`) — Ergonomic Mouse Suite
-
-| State / Modifiers | Turn CCW (↺) | Turn CW (↻) | Knob Click (🔘) | Workflow |
-| :--- | :--- | :--- | :--- | :--- |
-| **Fn (Alone)** | **Cursor Up** (`KC_MS_UP`) | **Cursor Down** (`KC_MS_DOWN`) | **Mouse Left Click** (`KC_MS_BTN1`) | Primary Y-axis mouse navigation and selection |
-| **Fn + Shift** | **Cursor Left** (`KC_MS_LEFT`) | **Cursor Right** (`KC_MS_RIGHT`) | **Mouse Right Click** (`KC_MS_BTN2`) | Primary X-axis mouse navigation & context menus |
-| **Fn + Alt** | **Horizontal Wheel Left** (`KC_MS_WH_LEFT`) | **Horizontal Wheel Right** (`KC_MS_WH_RIGHT`) | **Mouse Middle Click** (`KC_MS_BTN3`) | Wide timeline scrubbing, spreadsheets, diffs, autoscroll |
-
----
-
-## 🚀 Getting Started
-
-### 1. Prerequisites (Arch Linux)
-
-Install the required build toolchain and dependencies:
+### Prerequisites (Arch Linux)
 
 ```bash
-sudo pacman -S --needed git arm-none-eabi-gcc arm-none-eabi-newlib arm-none-eabi-binutils python-pipx cmake libusb
+sudo pacman -S --needed git arm-none-eabi-gcc arm-none-eabi-newlib \
+  arm-none-eabi-binutils python-pipx cmake libusb
 pipx install qmk
 pipx ensurepath
 ```
 
-Install the Westberry DFU flasher utility:
+Build and install the Westberry flasher:
 
 ```bash
 git clone https://github.com/westberrytech/wb32-dfu-updater.git
@@ -218,126 +152,182 @@ cmake .. && make
 sudo cp wb32-dfu-updater_cli /usr/local/bin/
 ```
 
-### 2. Install Udev Rules
+`setup_and_flash.sh` sets the QMK CLI home to `~/qmk_gmmk3` with `qmk config user.qmk_home`. This is a global QMK CLI setting. If you use QMK for other boards, point it back at that tree afterward.
 
-Allow non-root flashing and WebHID access (for VIA):
+### Udev rules
 
-```bash
-sudo cp udev/99-gmmk3-pro.rules /etc/udev/rules.d/
-sudo udevadm control --reload-rules && sudo udevadm trigger
-```
+Install the rules for non-root flashing, WebHID, and the sleep policy:
 
-Alternatively, use the Makefile shortcut:
 ```bash
 make udev
 ```
 
-### 3. Build Firmware
+The rule disables USB wakeup for `504b:320f` by default. `systemctl suspend` and `systemctl sleep` then keep the machine asleep, and you wake it with the power button. To wake with the keyboard, edit `/etc/udev/rules.d/99-gmmk3-pro.rules`, comment the `power/wakeup="disabled"` line, uncomment the `enabled` line, reload the rules, and replug the keyboard. See [Sleep and wake](#sleep-and-wake).
 
-Compile the firmware using the automated build script:
+### Build
 
 ```bash
 make build
-# or: ./setup_and_flash.sh --build
 ```
 
-The script automatically clones the upstream Glorious QMK branch from GitLab, updates submodules (`chibios`, `chibios-contrib`, `lufa`, `printf`), applies this repository's performance overlay, and compiles `.build/gmmk_gmmk3_p75_iso_default.bin`.
+The script checks out the pinned upstream commit, restores tracked files, applies the overlay in `qmk_overlay/`, and compiles `gmmk_gmmk3_p75_iso_default.bin`. It prints the upstream commit and tool versions. The build also needs the ChibiOS, ChibiOS-Contrib, LUFA, and printf submodules, which the script initializes.
 
-### 4. Flash to Keyboard
+The script treats `~/qmk_gmmk3` as a build tree. It restores tracked files before applying the overlay, so edits you make there are discarded. Edit `qmk_overlay/` instead.
 
-> [!IMPORTANT]
-> **Always run the flash command FIRST before putting the keyboard into DFU mode!**
-> Because entering DFU mode makes the keyboard completely unresponsive to typing, starting the flash command first ensures you don't need a second keyboard. The script will safely compile your firmware and wait (`Waiting for WB32 DFU device...`) until the keyboard is connected in bootloader mode.
+### Flash
 
-1. **Start the flasher:**
+Run the flash command first. It builds, then waits for the bootloader, so you do not need a second keyboard.
+
 ```bash
-./setup_and_flash.sh --flash
-# or: make flash
+make flash
 ```
 
-2. **Put the keyboard into DFU Bootloader mode while the script waits:**
-   * **Method 1 (Hardware Bootmagic — Most Reliable):** Unplug the USB cable, hold **`Space + B`** (or **`Esc`**), and reconnect the cable.
-   * **Method 2 (Software):** Press **`Fn + Esc`** on the keyboard (`QK_BOOT`).
+Then put the keyboard into DFU:
 
-   > [!TIP]
-   > **How to confirm DFU mode:** When entering the WB32 ROM DFU bootloader, **the keyboard will become completely unresponsive to typing and ALL RGB lights will turn OFF**. The script will instantly detect the keyboard, flash the firmware, and automatically reboot it back into typing mode!
+1. Unplug the USB cable.
+2. Hold the physical `Esc` key.
+3. Reconnect the cable while holding `Esc`.
 
-*Manual flash option (if already in DFU mode):*
+You can also press `Fn + Esc` while the script is waiting. When DFU starts, the keyboard stops typing and all RGB turns off. The script detects it, flashes, and reboots the keyboard.
+
+`Fn + Esc` sends `QK_BOOT` and keeps the dynamic keymap. Holding `Esc` during power-up uses Bootmagic Lite, which clears the EEPROM before it jumps to the bootloader. Use `Fn + Esc` when the keyboard still types, and hold `Esc` only for recovery.
+
+This QMK build uses Bootmagic Lite with the `Esc` key only. `Space + B` is not a bootloader shortcut here.
+
+Manual flash if the keyboard is already in DFU:
+
 ```bash
-wb32-dfu-updater_cli -D gmmk_gmmk3_p75_iso_default.bin -R
+wb32-dfu-updater_cli -w -D gmmk_gmmk3_p75_iso_default.bin -R
 ```
 
----
+The prebuilt binary in this repository has SHA-256:
 
-## 🌐 VIA Configurator (WebHID)
+```text
+a018af720685bc251c74b79355989f0dced3ba1cb547a4d2c9334bf632800f68
+```
 
-This firmware has full VIA v3 support enabled. You can customize keys and lighting directly from your browser without installing native software:
+## VIA
 
-1. Open **[https://usevia.app](https://usevia.app)** in Chromium, Chrome, or Brave.
-2. Go to the **Settings** gear icon $\rightarrow$ Enable **Show Design tab**.
-3. Click the **Design** (paintbrush) tab.
-4. Click **Load Draft Definition** and select:
-   * [`definition/gmmk3_via_v3_swedish.json`](definition/gmmk3_via_v3_swedish.json) (Swedish ISO key legends)
-   * OR [`definition/gmmk3_via_v3.json`](definition/gmmk3_via_v3.json) (Standard layout definition)
-5. Return to the **Configure** tab and click **Authorize device** $\rightarrow$ select `GMMK3 75% ISO`.
+1. Open [usevia.app](https://usevia.app) in Chromium, Chrome, or Brave.
+2. Open Settings and enable the Design tab.
+3. Open Design, choose **Load Draft Definition**, and select one of:
+   - `definition/gmmk3_via_v3_swedish.json` for Swedish legends.
+   - `definition/gmmk3_via_v3.json` for the standard definition.
+4. Go to Configure, authorize `GMMK3 75% ISO`, and edit the four layers.
 
-All 4 layers (`PROF_LINUX`, `PROF_MAC`, `PROF_WIN`, and `SHARED_FN`) are editable in real-time.
+The custom keycodes `KNOB_CLICK` and `FN_SLEP` are in both definitions. The RGB menu uses the QMK RGB matrix menu.
 
----
+EEPROM remaps survive reflashing the same layout version. A layout version change or `Fn + Backspace` clears them. Holding `Esc` during power-up also clears them, because that is Bootmagic.
 
-## 📁 Repository Structure
+## Sleep and wake
+
+The keyboard advertises USB Remote Wakeup. On this board the rear slider reads as a held key, so a stock QMK build wakes the host as soon as it suspends. A device reset or reconnect can also wake a suspended host.
+
+This release handles it in two places:
+
+1. **Udev:** `power/wakeup` is `disabled` for `504b:320f` by default. This is the reliable fix. The power button wakes the machine.
+2. **Firmware:** `suspend_wakeup_condition_kb()` masks column 7 on rows 11 to 13, waits about 255 ms after suspend entry, and only wakes on a key that was released and then pressed. The state resets on a new suspend entry even if the wakeup hook did not run.
+
+The firmware guard cannot stop a host wake caused by a device reset or reconnect. If you enable keyboard wake and the machine still wakes, disable wakeup again and use the power button.
+
+To inspect the current setting:
+
+```bash
+for d in /sys/bus/usb/devices/*; do
+  if [ "$(cat "$d/idVendor" 2>/dev/null)" = "504b" ] &&
+     [ "$(cat "$d/idProduct" 2>/dev/null)" = "320f" ]; then
+    echo "$d $(cat "$d/power/wakeup")"
+  fi
+done
+```
+
+To test sleep:
+
+```bash
+systemctl suspend
+journalctl -k -b -1 | grep -E 'suspend entry|suspend exit|Waking up'
+```
+
+## Chatter tuning
+
+The current setting is `asym_eager_defer_pk` with `DEBOUNCE 8` in `qmk_overlay/keyboards/gmmk/gmmk3/p75/config.h`. The debounce type is set in `qmk_overlay/keyboards/gmmk/gmmk3/p75/iso/rules.mk`.
+
+If a key still produces two letters:
+
+1. Raise `DEBOUNCE` to 10 or 12 and rebuild.
+2. If the duplicate happens on press instead of release, change `DEBOUNCE_TYPE` to `sym_defer_pk`. That filters both edges but adds the same delay to keydown.
+3. If one key still doubles with a longer debounce, the switch is likely worn. Replace it.
+
+`asym_eager_defer_pk` caps `DEBOUNCE` at 127 ms.
+
+A key that doubles only when pressed quickly is bounce under fast actuation. Software can filter it with `sym_defer_pk` at 10 ms, at the cost of 10 ms keydown. If you want to keep the eager press, replace the switch.
+
+A single key that doubles on slow, deliberate presses points to the switch or its socket. Reseat the switch, then swap it with a known-good switch. If the duplicate follows the switch, replace the switch. If it stays in the same socket, inspect the socket and PCB. A board where every key doubles during fast typing points to debounce instead.
+
+Test with `evtest`, `wev` on Wayland, or a keyboard tester page. Type the problem keys slowly and quickly, and count duplicate press or release events.
+
+## Troubleshooting
+
+**The PC wakes immediately after `systemctl suspend` or `systemctl sleep`.**
+Check `power/wakeup` for `504b:320f`. It should read `disabled`. If it reads `enabled`, reinstall the udev rule with `make udev`, then replug the keyboard or run `sudo udevadm trigger --action=add --subsystem-match=usb`.
+
+**The keyboard does not type after a flash.**
+It may be in DFU. Reconnect it while holding `Esc`, or run `wb32-dfu-updater_cli -R` to reset it.
+
+**The keyboard is stuck in the bootloader.**
+Unplug and replug the USB cable. If it still enumerates as `342d:dfa0`, flash again with `make flash`.
+
+**VIA remaps do not match the firmware.**
+Press `Fn + Backspace` to clear the dynamic keymap, then replug. The firmware also clears the layout when the EEPROM magic version changes.
+
+**The build fails after an upstream change.**
+The script pins commit `121e1a63`. Delete `~/qmk_gmmk3` and rerun. If you change the pin, expect to update the overlay under `qmk_overlay/`.
+
+## Repository layout
 
 ```text
 gmmk3linux/
-├── README.md                      # Documentation, architecture, and user guide
-├── LICENSE                        # GNU General Public License v2.0
-├── Makefile                       # Convenience targets (build, flash, udev, clean)
-├── setup_and_flash.sh             # 1-click clone, patch, build, and flash script
-├── gmmk_gmmk3_p75_iso_default.bin # Precompiled ready-to-flash binary
-├── udev/
-│   └── 99-gmmk3-pro.rules         # Udev rules for WB32 DFU & WebHID
+├── README.md
+├── CHANGELOG.md
+├── LICENSE
+├── Makefile
+├── setup_and_flash.sh
+├── gmmk_gmmk3_p75_iso_default.bin
+├── udev/99-gmmk3-pro.rules
 ├── definition/
-│   ├── gmmk3_via_v3.json          # Standard VIA v3 layout definition
-│   └── gmmk3_via_v3_swedish.json  # Swedish ISO localized VIA v3 definition
-└── qmk_overlay/                   # Drop-in overlay for Glorious QMK tree
-    └── keyboards/
-        └── gmmk/
-            └── gmmk3/
-                └── p75/
-                    ├── config.h   # Low latency & 1000Hz polling tuning
-                    ├── halconf.h  # SPI and hardware config
-                    ├── info.json  # Matrix and RGB animations
-                    ├── mcuconf.h  # MCU clock and peripheral configuration
-                    └── iso/
-                        ├── info.json
-                        ├── iso.c  # AW20216S LED driver mapping
-                        ├── rules.mk
-                        └── keymaps/
-                            └── default/
-                                └── keymap.c # Multi-OS adaptive keymap & knob engine
+│   ├── gmmk3_via_v3.json
+│   └── gmmk3_via_v3_swedish.json
+├── docs/
+│   ├── GLOSSARY.md
+│   └── adr/
+│       ├── 0001-slider-matrix-mapping.md
+│       ├── 0002-suspend-wake-policy.md
+│       └── 0003-debounce-tradeoff.md
+└── qmk_overlay/
+    ├── platforms/
+    │   ├── suspend.c
+    │   └── suspend.h
+    └── keyboards/gmmk/gmmk3/p75/
+        ├── config.h
+        └── iso/
+            ├── iso.c
+            ├── rules.mk
+            └── keymaps/default/keymap.c
 ```
 
----
+`qmk_overlay/` mirrors the upstream QMK tree. Only changed files live here. The overlay also patches `platforms/suspend.c` and `platforms/suspend.h` to expose a keyboard-level wake condition. That patch is tied to the pinned upstream commit.
 
-## 🆘 Troubleshooting & Recovery
+## Build reproducibility
 
-* **PC immediately wakes up on `systemctl suspend` / keyboard freezes after sleep**:
-  This happens when the host allows USB wakeups and the firmware does not mask the rear 3-position slider switch (which is physically closed 24/7 in the matrix).
-  * **Fix 1 (Firmware)**: Build and flash the latest firmware (`make flash`). It masks Column 7 on rows 11–13 during suspend and introduces `USB_SUSPEND_WAKEUP_DELAY` (200ms) to ensure USB hubs settle smoothly.
-  * **Fix 2 (Linux OS / Udev)**: If you never want this keyboard to wake the PC from sleep (e.g. to prevent accidental bumps or pet wakeups), disable wakeup in udev:
-    ```bash
-    echo 'ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="504b", ATTR{idProduct}=="320f", TEST=="power/wakeup", ATTR{power/wakeup}="disabled"' | sudo tee -a /etc/udev/rules.d/99-gmmk3-pro.rules
-    sudo udevadm control --reload-rules && sudo udevadm trigger
-    ```
-* **Keyboard unresponsive / stuck in bootloader**:
-  Run `wb32-dfu-updater_cli -R` to trigger a software reset, or reconnect the USB cable.
-* **Reset EEPROM (Clear VIA remappings)**:
-  Press **Fn + Backspace** (`EE_CLR`), then replug the board.
-* **Force Bootloader on Plug-in**:
-  Unplug the USB cable, hold down the physical `Esc` key (or `Space + B`), and reconnect the cable.
+- Upstream: `https://gitlab.com/glorious-public/qmk_firmware.git`, branch `gmmk3_p75_ansi_iso_wired`, commit `121e1a6341c5c045b396dab8c5e755a4b9a4aefd`.
+- QMK CLI: 1.2.0.
+- Compiler: `arm-none-eabi-gcc` 16.2.0 (Arch).
+- Tested on: Arch Linux, kernel 7.2.3, Hyprland.
 
----
+## License and credits
 
-## 📜 License
+GPL-2.0-or-later. See [LICENSE](LICENSE).
 
-This project is licensed under the **GNU General Public License v2.0 (GPL-2.0-or-later)** to match QMK Firmware. See [LICENSE](LICENSE) for details.
+Board files and the vendor QMK branch come from Glorious. The firmware uses QMK, ChibiOS, ChibiOS-Contrib, and the Westberry WB32 support. VIA definitions use the VIA v3 layout format.
+
+Maintained by [abbguslof](https://github.com/abbguslof).
